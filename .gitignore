@@ -1,0 +1,26 @@
+# Sistema
+.DS_Store
+
+# Dependencias y compilados futuros
+node_modules/
+dist/
+target/
+src-tauri/target/
+src-tauri/gen/
+coverage/
+*.log
+
+# Configuración privada
+.env
+.env.*
+!.env.example
+
+# Datos financieros y copias locales
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+backups/
+user-data/

@@ -1,0 +1,101 @@
+:root {
+  --paper: #faf9f5;
+  --panel: #f0efe8;
+  --ink: #232b2a;
+  --muted: #626862;
+  --line: #dcded4;
+  --line-strong: #c4c7ba;
+  --blue: #1649d8;
+  --blue-deep: #123fc6;
+  --blue-soft: #e9effe;
+  --orange: #ea5834;
+  --income: #2d6a3e;
+  --danger: #ae2e22;
+  --danger-soft: #fbecea;
+
+  /* Portada: Fraunces, serif «old style» inspirada en la publicidad impresa de principios del s. XX. */
+  --font-portada: "Fraunces Variable", Georgia, "Times New Roman", serif;
+  /* Registro: Instrument Sans, grotesca editorial con cifras tabulares. */
+  --font-app: "Instrument Sans Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+
+  --radius: 5px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --shadow-xs: 0 1px 2px rgb(35 43 42 / 0.06);
+  --shadow-sm: 0 1px 2px rgb(35 43 42 / 0.06), 0 2px 6px -2px rgb(35 43 42 / 0.1);
+  --shadow-md: 0 2px 4px rgb(35 43 42 / 0.05), 0 8px 20px -6px rgb(35 43 42 / 0.16);
+  --shadow-lg: 0 12px 40px -8px rgb(20 26 25 / 0.28), 0 2px 6px rgb(20 26 25 / 0.08);
+
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font: 14px/1.5 var(--font-app);
+  color: var(--ink);
+  background: var(--paper);
+  overflow: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

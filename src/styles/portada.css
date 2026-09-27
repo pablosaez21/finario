@@ -1,0 +1,234 @@
+/* Portada: paisaje de Madrid con la interfaz real superpuesta. */
+
+.portada {
+  /* Relación de aspecto del paisaje (1654 × 923). */
+  --ratio: 1.792;
+  /* El paisaje ocupa todo el ancho; en ventanas estrechas se recorta un poco por los lados
+     (más por la derecha, para no perder Estrecho) y el cielo se prolonga hacia arriba. */
+  --w: max(100vw, calc(75vh * var(--ratio)));
+  --sky: #024eb6;
+
+  position: relative;
+  height: 100vh;
+  min-height: 560px;
+  overflow: hidden;
+  background: var(--sky);
+  color: #fff;
+  font-family: var(--font-portada);
+  font-optical-sizing: auto;
+  isolation: isolate;
+}
+
+.portada button {
+  font-family: inherit;
+}
+
+.portada__paisaje {
+  position: absolute;
+  bottom: 0;
+  left: calc((100vw - var(--w)) * 0.3);
+  width: var(--w);
+  height: auto;
+  z-index: -2;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 64px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 64px);
+  animation: portada-aparece 700ms var(--ease) both;
+}
+
+/* Grano sutil para integrar el cielo prolongado con la textura del paisaje. */
+.portada__grano {
+  position: absolute;
+  inset: 0 0 auto;
+  height: max(0px, calc(100vh - var(--w) / var(--ratio) + 80px));
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.55;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  mask-image: linear-gradient(to bottom, #000 60%, transparent);
+}
+
+.portada__contenido {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(26px, 5.4vh, 60px) 24px 0;
+  text-align: center;
+  animation: portada-sube 800ms var(--ease) 120ms both;
+}
+
+.portada__titulo {
+  font: italic 400 clamp(54px, min(5.2vw, 8.4vh), 70px) / 1 var(--font-portada);
+  font-variation-settings: "opsz" 144, "SOFT" 60, "WONK" 1;
+  letter-spacing: -0.015em;
+  text-shadow: 0 2px 22px rgb(0 22 90 / 0.4), 0 1px 2px rgb(0 22 90 / 0.25);
+}
+
+.portada__lema {
+  max-width: 36em;
+  margin-top: clamp(10px, 1.8vh, 16px);
+  font: 360 clamp(18px, min(1.45vw, 2.7vh), 21px) / 1.4 var(--font-portada);
+  font-variation-settings: "opsz" 24, "SOFT" 50, "WONK" 0;
+  letter-spacing: 0.005em;
+  color: rgb(255 255 255 / 0.95);
+  text-shadow: 0 1px 12px rgb(0 22 90 / 0.45);
+  text-wrap: balance;
+}
+
+.portada__lema span {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.portada__acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 1.4vh, 12px);
+  margin-top: clamp(20px, 4vh, 36px);
+}
+
+.portada__boton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  width: clamp(290px, 21vw, 336px);
+  height: clamp(50px, 6.6vh, 60px);
+  padding: 0 22px;
+  border-radius: 6px;
+  font: 540 17.5px / 1 var(--font-portada);
+  font-variation-settings: "opsz" 18, "SOFT" 40, "WONK" 0;
+  letter-spacing: 0.005em;
+  transition:
+    transform 180ms var(--ease),
+    box-shadow 220ms var(--ease),
+    background-color 180ms var(--ease),
+    border-color 180ms var(--ease),
+    filter 180ms var(--ease);
+}
+
+.portada__boton:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.portada__icono {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+
+.portada__boton--principal {
+  border: 1px solid rgb(255 200 170 / 0.28);
+  background: linear-gradient(180deg, #e2653b 0%, #d4532b 55%, #c84b26 100%);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    0 1px 2px rgb(12 22 70 / 0.25),
+    0 8px 18px -8px rgb(12 22 70 / 0.6);
+}
+
+.portada__boton--principal:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06) saturate(1.04);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.26),
+    0 2px 4px rgb(12 22 70 / 0.22),
+    0 16px 30px -10px rgb(12 22 70 / 0.7);
+}
+
+.portada__boton--principal:active {
+  transform: translateY(0) scale(0.992);
+  filter: brightness(0.97);
+  box-shadow:
+    inset 0 1px 2px rgb(90 20 0 / 0.25),
+    0 1px 2px rgb(12 22 70 / 0.25),
+    0 4px 10px -6px rgb(12 22 70 / 0.5);
+}
+
+.portada__flecha {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  transition: transform 200ms var(--ease);
+}
+
+.portada__boton--principal:hover .portada__flecha,
+.portada__boton--principal:focus-visible .portada__flecha {
+  transform: translateX(4px);
+}
+
+.portada__proximo {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.portada__boton--analisis {
+  border: 1px solid rgb(255 255 255 / 0.4);
+  background: rgb(26 70 178 / 0.3);
+  -webkit-backdrop-filter: blur(3px) saturate(1.05);
+  backdrop-filter: blur(3px) saturate(1.05);
+  color: rgb(255 255 255 / 0.68);
+  cursor: not-allowed;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+.portada__boton--analisis:hover {
+  border-color: rgb(255 255 255 / 0.5);
+  background: rgb(26 70 178 / 0.36);
+}
+
+.portada__etiqueta {
+  padding: 4px 11px 5px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.14);
+  color: rgb(255 255 255 / 0.86);
+  font-size: 12.5px;
+  font-weight: 500;
+  font-variation-settings: "opsz" 12, "SOFT" 40, "WONK" 0;
+  letter-spacing: 0.01em;
+}
+
+.portada__aviso {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  padding: 5px 11px;
+  border-radius: 5px;
+  background: rgb(8 24 72 / 0.82);
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px -6px rgb(0 10 40 / 0.6);
+  opacity: 0;
+  transform: translate(-50%, -3px);
+  pointer-events: none;
+  transition: opacity 160ms var(--ease), transform 160ms var(--ease);
+}
+
+.portada__boton--analisis:hover + .portada__aviso,
+.portada__boton--analisis:focus-visible + .portada__aviso {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition-delay: 250ms;
+}
+
+@keyframes portada-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes portada-sube {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}

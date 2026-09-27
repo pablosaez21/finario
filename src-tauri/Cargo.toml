@@ -1,0 +1,27 @@
+[package]
+name = "finario"
+version = "0.1.0"
+description = "Registro personal de gastos e ingresos"
+edition = "2021"
+publish = false
+
+[lib]
+name = "finario_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "=2.6.3", features = [] }
+
+[dependencies]
+tauri = { version = "=2.11.6", features = [] }
+tauri-plugin-dialog = "=2.7.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "=0.40.2", features = ["bundled", "backup"] }
+chrono = { version = "=0.4.45", default-features = false, features = ["clock", "std"] }
+uuid = { version = "=1.26.0", features = ["v4"] }
+thiserror = "=2.0.20"
+
+[dev-dependencies]
+tempfile = "3"
+tauri = { version = "=2.11.6", features = ["test"] }

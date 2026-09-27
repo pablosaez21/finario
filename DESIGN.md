@@ -1,5 +1,9 @@
 # Finario — dirección de diseño y alcance
 
+## Actualización de alcance: analíticas
+
+La fase inicial de portada y registro ya está implementada. La siguiente fase aprobada se especifica en [docs/ANALYTICS.md](docs/ANALYTICS.md), incluidas las animaciones y la búsqueda local inspiradas en ObsidianUI. Cuando el encargo sea implementar analíticas, ese documento prevalece sobre las restricciones históricas de esta documentación que mantienen Análisis desactivado o excluyen gráficas. **Fase implementada (27 sep 2026):** Análisis está activo en la portada y en el interior; las menciones históricas a «Próximamente» se refieren a la primera fase.
+
 Estado: segunda versión de la portada aprobada visualmente por el usuario. Nombre aprobado: Finario. Textos de portada actualizados según la última instrucción del usuario. Plan para entregar al agente implementador. En esta conversación se ha preparado el plan y una preview; no se ha construido la aplicación.
 
 ## Objetivo

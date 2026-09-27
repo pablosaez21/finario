@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use rusqlite::Connection;
+use rusqlite::{functions::FunctionFlags, Connection};
 
 use crate::error::{AppError, AppResult};
 
@@ -83,7 +83,31 @@ pub fn configure(conn: &Connection) -> AppResult<()> {
     if fk != 1 {
         return Err(AppError::new("database", "No se pudo activar la integridad referencial."));
     }
+    conn.create_scalar_function(
+        "fold",
+        1,
+        FunctionFlags::SQLITE_UTF8 | FunctionFlags::SQLITE_DETERMINISTIC,
+        |ctx| Ok(ctx.get::<Option<String>>(0)?.map(|s| fold(&s))),
+    )?;
     Ok(())
+}
+
+/// Normaliza texto para búsquedas: minúsculas y sin tildes ni diéresis ("Nómina" → "nomina").
+pub fn fold(text: &str) -> String {
+    text.chars()
+        .flat_map(char::to_lowercase)
+        .map(|c| match c {
+            'á' | 'à' | 'â' | 'ä' | 'ã' | 'å' => 'a',
+            'é' | 'è' | 'ê' | 'ë' => 'e',
+            'í' | 'ì' | 'î' | 'ï' => 'i',
+            'ó' | 'ò' | 'ô' | 'ö' | 'õ' => 'o',
+            'ú' | 'ù' | 'û' | 'ü' => 'u',
+            'ñ' => 'n',
+            'ç' => 'c',
+            'ý' | 'ÿ' => 'y',
+            other => other,
+        })
+        .collect()
 }
 
 pub fn migrate(conn: &mut Connection) -> AppResult<()> {

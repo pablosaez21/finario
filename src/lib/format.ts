@@ -69,6 +69,76 @@ export function formatBytes(bytes: number): string {
   return `${(bytes / 1024 / 1024).toFixed(1).replace(".", ",")} MB`;
 }
 
+/** Importe sin céntimos cuando son cero: 7200 → "72 €", 7250 → "72,50 €". */
+export function formatEurosShort(cents: number): string {
+  return Math.abs(cents) % 100 === 0 ? formatEuros(cents).replace(",00", "") : formatEuros(cents);
+}
+
+/** Cambio con signo explícito: "+18,00 €", "−6,00 €". */
+export function formatChange(cents: number): string {
+  return cents > 0 ? `+${formatEuros(cents)}` : formatEuros(cents);
+}
+
+export function formatPct(value: number, signed = true): string {
+  const sign = signed && value > 0 ? "+" : value < 0 ? "−" : "";
+  return `${sign}${Math.abs(value).toFixed(1).replace(".", ",")}\u00a0%`;
+}
+
+export function formatBalance(cents: number): string {
+  return cents > 0 ? `+${formatEuros(cents)}` : formatEuros(cents);
+}
+
+// ---------- Meses ----------
+
+export function currentMonth(): string {
+  return todayISO().slice(0, 7);
+}
+
+export function addMonths(month: string, delta: number): string {
+  const [y, m] = month.split("-").map(Number);
+  const index = y * 12 + (m - 1) + delta;
+  return `${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, "0")}`;
+}
+
+function lastDayOf(month: string): number {
+  const [y, m] = month.split("-").map(Number);
+  return new Date(y, m, 0).getDate();
+}
+
+/** Rango del periodo mensual: hasta hoy en el mes en curso, completo en meses cerrados. */
+export function monthRange(month: string): { start: string; end: string } {
+  const today = todayISO();
+  const end = month === today.slice(0, 7) ? today : `${month}-${String(lastDayOf(month)).padStart(2, "0")}`;
+  return { start: `${month}-01`, end };
+}
+
+export function monthName(month: string): string {
+  return MONTHS_LONG[Number(month.slice(5, 7)) - 1];
+}
+
+export function monthLabel(month: string): string {
+  const name = monthName(month);
+  return `${name[0].toUpperCase()}${name.slice(1)} ${month.slice(0, 4)}`;
+}
+
+export function monthShort(month: string): string {
+  const s = MONTHS[Number(month.slice(5, 7)) - 1];
+  return s[0].toUpperCase() + s.slice(1);
+}
+
+/** "1–27 sep 2026" (o "28 feb – 3 mar 2026" si cruza meses). */
+export function formatRange(start: string, end: string, withYear = true): string {
+  const a = parts(start);
+  const b = parts(end);
+  const year = withYear ? ` ${b.y}` : "";
+  if (a.y === b.y && a.m === b.m) return `${a.d}–${b.d} ${MONTHS[b.m - 1]}${year}`;
+  return `${a.d} ${MONTHS[a.m - 1]} – ${b.d} ${MONTHS[b.m - 1]}${year}`;
+}
+
+export function isMac(): boolean {
+  return /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+}
+
 export function newId(): string {
   return crypto.randomUUID();
 }

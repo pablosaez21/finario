@@ -21,3 +21,10 @@ Los importes, fechas y categorías visibles son ejemplos; no cargar esos datos e
 Versión navegable histórica, incluida como apoyo para inspeccionar el diseño con más detalle que la captura. Abrir en navegador. Sus datos están en memoria y no se guardan. Las funciones mensuales visibles están fuera del alcance de implementación actual. No copiar sus reglas de demo (por ejemplo, fechas restringidas a septiembre) al producto.
 
 Las instrucciones actuales de DESIGN.md prevalecen sobre los textos, controles y datos históricos de ambas referencias.
+
+## Analíticas · segunda fase aprobada
+
+- [03-analiticas-resumen.jpg](03-analiticas-resumen.jpg): resumen, categorías y gasto acumulado.
+- [04-analiticas-categoria.jpg](04-analiticas-categoria.jpg): detalle y movimientos de una categoría.
+
+Son maquetas con datos ficticios. Seguir [ANALYTICS.md](../ANALYTICS.md) para métricas e interacciones, incluido el buscador tipo Spotlight y las animaciones de ObsidianUI que no pueden apreciarse en una captura. Mantener los recursos originales de portada y registro.

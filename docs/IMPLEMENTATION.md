@@ -1,5 +1,9 @@
 # Plan para el agente implementador
 
+## Actualización de alcance: analíticas
+
+La fase inicial de portada y registro ya está implementada. La siguiente fase aprobada se especifica en [ANALYTICS.md](ANALYTICS.md), incluidas las animaciones y la búsqueda local inspiradas en ObsidianUI. Cuando el encargo sea implementar analíticas, ese documento prevalece sobre las restricciones históricas de esta documentación que mantienen Análisis desactivado o excluyen gráficas. **Fase implementada (27 sep 2026):** Análisis está activo en la portada y en el interior; las menciones históricas a «Próximamente» se refieren a la primera fase.
+
 Estado inicial: documentación y referencias únicamente. Las siguientes tareas están pendientes.
 
 ## 1. Arranque

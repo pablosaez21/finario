@@ -21,14 +21,6 @@
   box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.08);
 }
 
-.head__kicker {
-  margin: 0 0 5px;
-  font-size: 11px;
-  letter-spacing: 1.8px;
-  text-transform: uppercase;
-  color: rgb(255 255 255 / 0.9);
-}
-
 .head__brand {
   /* Logotipo: misma tipografía que la portada para mantener la identidad. */
   font: italic 400 34px / 1.05 var(--font-portada);
@@ -61,8 +53,46 @@
   background: rgb(255 255 255 / 0.16);
 }
 
-.head__home:focus-visible {
+.head__home:focus-visible,
+.head__search:focus-visible {
   outline-color: #fff;
+}
+
+.head__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.head__search {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 200px;
+  padding: 6px 7px 6px 11px;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.1);
+  color: rgb(255 255 255 / 0.86);
+  font-size: 13px;
+  transition: background-color 120ms var(--ease), border-color 120ms var(--ease), color 120ms var(--ease);
+}
+
+.head__search span {
+  flex: 1;
+  text-align: left;
+}
+
+.head__search kbd {
+  border-color: rgb(255 255 255 / 0.25);
+  background: rgb(255 255 255 / 0.12);
+  color: #fff;
+}
+
+.head__search:hover {
+  border-color: rgb(255 255 255 / 0.5);
+  background: rgb(255 255 255 / 0.16);
+  color: #fff;
 }
 
 /* ---------- Pestañas ---------- */
@@ -76,11 +106,63 @@
   border-bottom: 1px solid var(--line);
 }
 
+.tabs__list {
+  position: relative;
+  display: flex;
+  gap: 28px;
+}
+
 .tabs__item {
   padding: 16px 0 13px;
-  border-bottom: 3px solid var(--blue);
-  color: var(--blue);
+  border: 0;
+  background: none;
+  color: var(--ink);
   font-weight: 500;
+  transition: color 120ms var(--ease);
+}
+
+.tabs__item:hover {
+  color: var(--blue);
+}
+
+.tabs__item[aria-selected="true"] {
+  color: var(--blue);
+}
+
+.tabs__item:focus-visible {
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+/* Indicador inspirado en Magnet Tabs (ObsidianUI): se desliza; las etiquetas no se mueven. */
+.tabs__indicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  height: 3px;
+  border-radius: 2px 2px 0 0;
+  background: var(--blue);
+  pointer-events: none;
+}
+
+.tabs__list.is-ready .tabs__indicator {
+  transition: transform 170ms var(--ease), width 170ms var(--ease);
+}
+
+/* ---------- Paneles ---------- */
+
+.panels {
+  display: grid;
+  min-height: 0;
+}
+
+.panel {
+  display: grid;
+  min-height: 0;
+}
+
+.panel > * {
+  min-height: 0;
 }
 
 .tabs__tools {
@@ -153,36 +235,56 @@
 
 /* ---------- Formulario ---------- */
 
-.toggle {
+/* Selector segmentado: el fondo de selección se desliza (140–160 ms). */
+.seg {
+  position: relative;
   display: inline-flex;
   gap: 3px;
-  margin-top: 25px;
   padding: 3px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--paper);
+  isolation: isolate;
 }
 
-.toggle--compact {
-  margin-top: 0;
+.seg__indicator {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  z-index: -1;
+  border-radius: 4px;
+  background: var(--ink);
+  box-shadow: 0 1px 2px rgb(35 43 42 / 0.25);
 }
 
-.toggle button {
+.seg.is-ready .seg__indicator {
+  transition: transform 150ms var(--ease), width 150ms var(--ease);
+}
+
+.seg__option {
   padding: 7px 16px;
   border: 0;
   border-radius: 4px;
   background: transparent;
-  transition: background-color 150ms var(--ease), color 150ms var(--ease), box-shadow 150ms var(--ease);
+  transition: color 150ms var(--ease), background-color 120ms var(--ease);
 }
 
-.toggle button:hover:not([aria-pressed="true"]) {
+.seg__option:hover:not([aria-pressed="true"]) {
   background: rgb(35 43 42 / 0.06);
 }
 
-.toggle button[aria-pressed="true"] {
-  background: var(--ink);
+.seg__option[aria-pressed="true"] {
   color: var(--paper);
-  box-shadow: 0 1px 2px rgb(35 43 42 / 0.25);
+}
+
+.seg--sm .seg__option {
+  padding: 5px 12px;
+  font-size: 12.5px;
+}
+
+.form__kind {
+  margin-top: 25px;
 }
 
 .amount__label {

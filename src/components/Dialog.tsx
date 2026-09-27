@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
+import { trapTab } from "../lib/keyboard";
 
 interface Props {
   title: string;
@@ -18,6 +19,8 @@ export default function Dialog({ title, description, onClose, children, wide }: 
     const dialog = ref.current;
     const opener = document.activeElement as HTMLElement | null;
     dialog?.showModal();
+    // El contenido no es enfocable hasta abrir el diálogo: se enfoca aquí el campo indicado.
+    dialog?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
     return () => {
       dialog?.close();
       opener?.focus?.();
@@ -36,6 +39,7 @@ export default function Dialog({ title, description, onClose, children, wide }: 
       onMouseDown={(e) => {
         if (e.target === ref.current) onClose();
       }}
+      onKeyDown={(e) => trapTab(e, ref.current)}
     >
       <div className="dialog__panel">
         <header className="dialog__head">

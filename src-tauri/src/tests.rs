@@ -256,6 +256,18 @@ fn ipc_commands_match_the_frontend_contract() {
     let reordered = call("reorder_categories", json!({ "kind": "expense", "ids": ids })).unwrap();
     assert_eq!(reordered[0]["id"], "salud");
 
+    let month = chrono::Local::now().format("%Y-%m").to_string();
+    let summary = call("analytics_summary", json!({ "month": month })).unwrap();
+    assert!(summary["expense"]["total"].is_i64());
+    assert!(summary["range"]["start"].is_string());
+    assert!(summary["cumulative"]["expense"]["current"].is_array());
+    let detail = call("category_detail", json!({ "categoryId": "ocio", "month": month, "limit": 5 })).unwrap();
+    assert_eq!(detail["category"]["id"], "ocio");
+    assert!(detail["evolution"].as_array().unwrap().len() == 6);
+    let found = call("search", json!({ "request": { "query": "proyecto", "start": null, "end": null, "categoryLimit": 5, "movementLimit": 10, "movementOffset": 0 } })).unwrap();
+    assert_eq!(found["movementTotal"], 1);
+    assert_eq!(call("analytics_summary", json!({ "month": "2999-01" })).unwrap_err()["code"], "future_month");
+
     let backup = call("create_backup", json!({})).unwrap();
     assert_eq!(backup["kind"], "manual");
     let info = call("backup_info", json!({})).unwrap();

@@ -2,7 +2,18 @@
 
 Aplicación personal de escritorio para registrar gastos e ingresos por categoría, con almacenamiento local y una portada ilustrada de Madrid.
 
-**Estado:** primera fase implementada: portada y registro de gastos e ingresos con persistencia SQLite local. Análisis aparece como «Próximamente» y está desactivado. Mi mes, gráficas y presupuestos quedan para fases posteriores.
+**Estado:** dos fases implementadas. La primera incluye la portada y el registro de gastos e ingresos con persistencia SQLite local. La segunda añade **Análisis**: resumen mensual, comparaciones entre periodos equivalentes, desglose y detalle por categoría, curva acumulada, observaciones calculadas y un buscador local tipo Spotlight (⌘K). Los presupuestos y el histórico de 6/12 meses quedan para más adelante.
+
+## Análisis
+
+Especificación en [docs/ANALYTICS.md](docs/ANALYTICS.md) y referencias 03 y 04 de `docs/references`.
+
+- **Resumen:** gastos, ingresos y balance del mes. En el mes en curso compara del día 1 a hoy con el mismo tramo del mes anterior, cortando en el último día común si el anterior es más corto; los meses cerrados se comparan completos. Si no hay registros previos muestra «Sin registros para comparar», nunca una caída del 100 %.
+- **Categorías:** tabla Gastos/Ingresos ordenable por importe, cambio en euros o porcentaje, con barras a escala común. Incluye curva de gasto acumulado frente al periodo anterior y de una a tres observaciones calculadas sin IA.
+- **Detalle:** importe, peso, número de movimientos, importe medio, evolución de 6 meses y movimientos. Se editan con el mismo formulario y las cifras se recalculan al guardar. Al volver se conservan periodo, orden, scroll y foco.
+- **Buscador:** ⌘K / Ctrl+K o el botón «Buscar…». Busca categorías y conceptos en SQLite sin distinguir mayúsculas ni tildes, con alcance «Este periodo» o «Todo el historial».
+
+Todos los cálculos se hacen en Rust sobre todo el historial SQLite, en céntimos enteros, excluyendo borrados y agrupando por ID de categoría (las archivadas se conservan).
 
 ## Requisitos
 
@@ -46,17 +57,19 @@ SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk pnpm app:dev
 
 ```
 src/                    React + TypeScript
-  screens/              Portada y Registro
-  components/           Formulario, lista, avisos, diálogos
+  screens/              Portada, Interior (pestañas), Apuntar y Análisis
+  components/           Formulario, lista, avisos, diálogos, buscador y analytics/
   lib/                  API de comandos Tauri, formato, iconos
   assets/               Paisaje de portada sin interfaz incrustada
 src-tauri/src/          Rust
   db.rs                 Conexión, PRAGMAs y migraciones
   money.rs              Parseo exacto de importes a céntimos
   store.rs              Categorías y movimientos
+  analytics.rs          Periodos, resumen, detalle, observaciones y búsqueda
   backup.rs             Copias, validación y restauración
   lib.rs                Comandos Tauri
   tests.rs              Tests de integración
+  analytics_tests.rs    Tests de cálculos, rangos y búsqueda
 scripts/prepare-portada.py   Genera src/assets/portada-madrid.jpg desde la referencia 01
 ```
 
@@ -77,7 +90,7 @@ scripts/prepare-portada.py   Genera src/assets/portada-madrid.jpg desde la refer
 - Título Finario más grande que el antiguo nombre de la referencia.
 - Debajo, exactamente: **Pecunia, si uti scis, ancilla est; si nescis, domina**
 - Acción principal: **Gastos e ingresos**.
-- Segunda acción: **Análisis · Próximamente**, desactivada.
+- Segunda acción: **Análisis**, activa desde la segunda fase (inicialmente «Próximamente»).
 - Interior limpio para registrar y gestionar movimientos. Mi mes y los análisis se harán después.
 - Stack: **Tauri 2 + React + TypeScript + SQLite**, con la lógica local en Rust.
 - Interfaz en español, funcionamiento offline, sin login. EUR como supuesto inicial pendiente de confirmación.

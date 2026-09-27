@@ -1,10 +1,16 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
 import { Check, Plus } from "lucide-react";
 import { api, toAppError, type AppError, type Category, type Kind, type Movement, type MovementInput } from "../lib/api";
 import { centsToInput, newId, todayISO } from "../lib/format";
 import { CategoryIcon } from "../lib/icons";
+import Segmented from "./Segmented";
 
 type Field = "amount" | "category" | "date" | "note";
+
+const KIND_OPTIONS: { value: Kind; label: string }[] = [
+  { value: "expense", label: "Gasto" },
+  { value: "income", label: "Ingreso" },
+];
 
 interface Props {
   categories: Category[];
@@ -27,6 +33,7 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
   const savingRef = useRef(false);
   const pendingId = useRef(newId());
   const amountRef = useRef<HTMLInputElement>(null);
+  const uid = useId();
 
   useEffect(() => {
     setErrors({});
@@ -119,28 +126,24 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
       }}
       aria-busy={saving}
     >
-      <div className="toggle" role="group" aria-label="Tipo de movimiento">
-        {(["expense", "income"] as Kind[]).map((k) => (
-          <button
-            key={k}
-            type="button"
-            aria-pressed={kind === k}
-            onClick={() => {
-              setKind(k);
-              clearError("category");
-            }}
-          >
-            {k === "expense" ? "Gasto" : "Ingreso"}
-          </button>
-        ))}
-      </div>
+      <Segmented
+        className="form__kind"
+        label="Tipo de movimiento"
+        options={KIND_OPTIONS}
+        value={kind}
+        onChange={(k) => {
+          setKind(k);
+          clearError("category");
+        }}
+      />
 
-      <label className="amount__label" htmlFor="importe">
+      <label className="amount__label" htmlFor={`${uid}-importe`}>
         Importe
       </label>
       <div className={`amount${errors.amount ? " is-invalid" : ""}`}>
         <input
-          id="importe"
+          id={`${uid}-importe`}
+          data-autofocus
           ref={amountRef}
           className="amount__input tabular"
           inputMode="decimal"
@@ -149,7 +152,7 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
           placeholder="0,00"
           value={amount}
           aria-invalid={!!errors.amount}
-          aria-describedby={errors.amount ? "importe-error" : undefined}
+          aria-describedby={errors.amount ? `${uid}-importe-error` : undefined}
           onChange={(e) => {
             setAmount(e.target.value);
             clearError("amount");
@@ -159,16 +162,16 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
           €
         </span>
       </div>
-      <FieldError id="importe-error" message={errors.amount} />
+      <FieldError id={`${uid}-importe-error`} message={errors.amount} />
 
-      <span className="label" id="categoria-label">
+      <span className="label" id={`${uid}-categoria`}>
         Categoría
       </span>
       <div
         className={`categories${errors.category ? " is-invalid" : ""}`}
         role="group"
-        aria-labelledby="categoria-label"
-        aria-describedby={errors.category ? "categoria-error" : undefined}
+        aria-labelledby={`${uid}-categoria`}
+        aria-describedby={errors.category ? `${uid}-categoria-error` : undefined}
       >
         {visible.map((c) => (
           <button
@@ -187,7 +190,7 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
           </button>
         ))}
       </div>
-      <FieldError id="categoria-error" message={errors.category} />
+      <FieldError id={`${uid}-categoria-error`} message={errors.category} />
 
       <div className="fields">
         <label className="field">

@@ -1,9 +1,12 @@
+mod analytics;
 mod backup;
 mod db;
 mod error;
 mod money;
 mod store;
 
+#[cfg(test)]
+mod analytics_tests;
 #[cfg(test)]
 mod tests;
 
@@ -12,6 +15,7 @@ use std::sync::Mutex;
 
 use tauri::{Manager, State};
 
+use analytics::{CategoryDetail, SearchRequest, SearchResults, Summary};
 use backup::{BackupFile, BackupInfo, BackupKind, BackupSummary};
 use error::{AppError, AppResult};
 use store::{Category, Kind, Movement, MovementInput, MovementPage, Store};
@@ -75,6 +79,25 @@ async fn delete_movement(state: Cmd<'_>, id: String) -> AppResult<()> {
 #[tauri::command]
 async fn restore_movement(state: Cmd<'_>, id: String) -> AppResult<Movement> {
     state.with(|s| s.restore_movement(&id))
+}
+
+fn today() -> chrono::NaiveDate {
+    chrono::Local::now().date_naive()
+}
+
+#[tauri::command]
+async fn analytics_summary(state: Cmd<'_>, month: String) -> AppResult<Summary> {
+    state.with(|s| s.analytics_summary(&month, today()))
+}
+
+#[tauri::command]
+async fn category_detail(state: Cmd<'_>, category_id: String, month: String, limit: i64) -> AppResult<CategoryDetail> {
+    state.with(|s| s.category_detail(&category_id, &month, limit, today()))
+}
+
+#[tauri::command]
+async fn search(state: Cmd<'_>, request: SearchRequest) -> AppResult<SearchResults> {
+    state.with(|s| s.search(&request))
 }
 
 #[tauri::command]
@@ -146,6 +169,9 @@ fn with_commands<R: tauri::Runtime>(builder: tauri::Builder<R>) -> tauri::Builde
         update_movement,
         delete_movement,
         restore_movement,
+        analytics_summary,
+        category_detail,
+        search,
         backup_info,
         create_backup,
         export_backup,

@@ -158,66 +158,31 @@
   transition: transform 200ms var(--ease);
 }
 
-.portada__boton--principal:hover .portada__flecha,
-.portada__boton--principal:focus-visible .portada__flecha {
+.portada__boton:hover .portada__flecha,
+.portada__boton:focus-visible .portada__flecha {
   transform: translateX(4px);
 }
 
-.portada__proximo {
-  position: relative;
-  display: flex;
-  justify-content: center;
-}
-
+/* Análisis: acción secundaria, translúcida sobre el cielo. */
 .portada__boton--analisis {
-  border: 1px solid rgb(255 255 255 / 0.4);
+  border: 1px solid rgb(255 255 255 / 0.42);
   background: rgb(26 70 178 / 0.3);
   -webkit-backdrop-filter: blur(3px) saturate(1.05);
   backdrop-filter: blur(3px) saturate(1.05);
-  color: rgb(255 255 255 / 0.68);
-  cursor: not-allowed;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  color: rgb(255 255 255 / 0.94);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 6px 16px -10px rgb(12 22 70 / 0.5);
 }
 
 .portada__boton--analisis:hover {
-  border-color: rgb(255 255 255 / 0.5);
-  background: rgb(26 70 178 / 0.36);
+  transform: translateY(-1px);
+  border-color: rgb(255 255 255 / 0.7);
+  background: rgb(26 70 178 / 0.44);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 14px 26px -12px rgb(12 22 70 / 0.65);
 }
 
-.portada__etiqueta {
-  padding: 4px 11px 5px;
-  border: 1px solid rgb(255 255 255 / 0.12);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.14);
-  color: rgb(255 255 255 / 0.86);
-  font-size: 12.5px;
-  font-weight: 500;
-  font-variation-settings: "opsz" 12, "SOFT" 40, "WONK" 0;
-  letter-spacing: 0.01em;
-}
-
-.portada__aviso {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  padding: 5px 11px;
-  border-radius: 5px;
-  background: rgb(8 24 72 / 0.82);
-  color: #fff;
-  font-size: 12px;
-  white-space: nowrap;
-  box-shadow: 0 6px 16px -6px rgb(0 10 40 / 0.6);
-  opacity: 0;
-  transform: translate(-50%, -3px);
-  pointer-events: none;
-  transition: opacity 160ms var(--ease), transform 160ms var(--ease);
-}
-
-.portada__boton--analisis:hover + .portada__aviso,
-.portada__boton--analisis:focus-visible + .portada__aviso {
-  opacity: 1;
-  transform: translate(-50%, 0);
-  transition-delay: 250ms;
+.portada__boton--analisis:active {
+  transform: translateY(0) scale(0.992);
+  background: rgb(18 52 150 / 0.5);
 }
 
 @keyframes portada-aparece {

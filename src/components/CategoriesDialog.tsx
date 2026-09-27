@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Archive, ArchiveRestore, ChevronDown, ChevronUp, Pencil, Plus } from "lucide-react";
 import Dialog from "./Dialog";
+import Segmented from "./Segmented";
 import { api, toAppError, type Category, type Kind } from "../lib/api";
 import { CATEGORY_ICONS, CategoryIcon } from "../lib/icons";
 
@@ -51,22 +52,19 @@ export default function CategoriesDialog({ categories, onChanged, onClose }: Pro
       description="Catálogo provisional. Renombrar o archivar no altera los movimientos ya registrados."
       onClose={onClose}
     >
-      <div className="toggle toggle--compact" role="group" aria-label="Tipo de categoría">
-        {(["expense", "income"] as Kind[]).map((k) => (
-          <button
-            key={k}
-            type="button"
-            aria-pressed={kind === k}
-            onClick={() => {
-              setKind(k);
-              setEditingId(null);
-              setError(null);
-            }}
-          >
-            {k === "expense" ? "Gastos" : "Ingresos"}
-          </button>
-        ))}
-      </div>
+      <Segmented
+        label="Tipo de categoría"
+        options={[
+          { value: "expense" as Kind, label: "Gastos" },
+          { value: "income" as Kind, label: "Ingresos" },
+        ]}
+        value={kind}
+        onChange={(k) => {
+          setKind(k);
+          setEditingId(null);
+          setError(null);
+        }}
+      />
 
       {error && (
         <p className="form-error" role="alert">

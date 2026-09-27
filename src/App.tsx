@@ -1,22 +1,20 @@
 import { useState } from "react";
 import Portada from "./screens/Portada";
-import Registro from "./screens/Registro";
-
-type Screen = "portada" | "registro";
+import Interior, { type Tab } from "./screens/Interior";
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>("portada");
-  const [visitedRegistro, setVisitedRegistro] = useState(false);
+  const [tab, setTab] = useState<Tab | null>(null);
+  const [cameFrom, setCameFrom] = useState<Tab | null>(null);
 
-  return screen === "portada" ? (
+  return tab === null ? (
     <Portada
-      focusPrimary={visitedRegistro}
-      onOpenRegistro={() => {
-        setVisitedRegistro(true);
-        setScreen("registro");
+      focusTab={cameFrom}
+      onOpen={(next) => {
+        setCameFrom(next);
+        setTab(next);
       }}
     />
   ) : (
-    <Registro onHome={() => setScreen("portada")} />
+    <Interior initialTab={tab} onHome={() => setTab(null)} />
   );
 }

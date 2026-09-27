@@ -20,7 +20,7 @@ pub const ICONS: &[&str] = &[
 pub const NOTE_MAX: usize = 120;
 pub const CATEGORY_NAME_MAX: usize = 40;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Kind {
     Expense,
@@ -35,7 +35,7 @@ impl Kind {
         }
     }
 
-    fn parse(value: &str) -> rusqlite::Result<Self> {
+    pub(crate) fn parse(value: &str) -> rusqlite::Result<Self> {
         match value {
             "expense" => Ok(Kind::Expense),
             "income" => Ok(Kind::Income),
@@ -106,15 +106,15 @@ pub struct Store {
     pub(crate) backups_dir: PathBuf,
 }
 
-const MOVEMENT_SELECT: &str = "SELECT m.id, m.kind, m.amount_cents, m.currency, m.category_id, c.name, c.icon,
+pub(crate) const MOVEMENT_SELECT: &str = "SELECT m.id, m.kind, m.amount_cents, m.currency, m.category_id, c.name, c.icon,
             m.date, m.note, m.created_at, m.updated_at
      FROM movements m JOIN categories c ON c.id = m.category_id";
 
-const CATEGORY_SELECT: &str = "SELECT c.id, c.kind, c.name, c.icon, c.sort_order, c.archived_at IS NOT NULL,
+pub(crate) const CATEGORY_SELECT: &str = "SELECT c.id, c.kind, c.name, c.icon, c.sort_order, c.archived_at IS NOT NULL,
             (SELECT COUNT(*) FROM movements m WHERE m.category_id = c.id AND m.deleted_at IS NULL)
      FROM categories c";
 
-fn movement_from_row(row: &Row) -> rusqlite::Result<Movement> {
+pub(crate) fn movement_from_row(row: &Row) -> rusqlite::Result<Movement> {
     Ok(Movement {
         id: row.get(0)?,
         kind: Kind::parse(&row.get::<_, String>(1)?)?,
@@ -130,7 +130,7 @@ fn movement_from_row(row: &Row) -> rusqlite::Result<Movement> {
     })
 }
 
-fn category_from_row(row: &Row) -> rusqlite::Result<Category> {
+pub(crate) fn category_from_row(row: &Row) -> rusqlite::Result<Category> {
     Ok(Category {
         id: row.get(0)?,
         kind: Kind::parse(&row.get::<_, String>(1)?)?,

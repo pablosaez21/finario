@@ -3,8 +3,8 @@ import { ArrowDown, ArrowRight, ArrowUp, ArrowUpRight } from "lucide-react";
 import Segmented from "../Segmented";
 import CumulativeChart from "./CumulativeChart";
 import type { CategoryRow, Kind, Summary } from "../../lib/api";
-import { formatBalance, formatChange, formatEuros, formatPct, monthName } from "../../lib/format";
-import { insightText, metricDelta, previousName, toneFor, type DeltaText } from "../../lib/analytics";
+import { formatBalance, formatChange, formatChangePct, formatEuros, formatPct, monthName } from "../../lib/format";
+import { arrow, insightText, metricDelta, previousName, toneFor, type DeltaText } from "../../lib/analytics";
 
 export type SortKey = "total" | "change" | "pct";
 export interface SortState {
@@ -61,14 +61,18 @@ export default function SummaryView({ data, kind, sort, onKind, onSort, onOpenCa
   const currentLabel = monthName(data.month)[0].toUpperCase() + monthName(data.month).slice(1);
   const previousLabel = `${prevName[0].toUpperCase()}${prevName.slice(1)}${data.isCurrentMonth ? " · mismos días" : ""}`;
 
-  const balanceLine = () => {
-    const parts: string[] = [];
-    parts.push(data.retainedPct !== null ? `${formatPct(data.retainedPct, false)} de tus ingresos` : "Sin ingresos registrados");
-    if (data.hasPrevious && data.balanceChange !== null) {
-      const c = data.balanceChange;
-      parts.push(c === 0 ? `igual que ${prevName}` : `${formatEuros(Math.abs(c))} ${c > 0 ? "más" : "menos"}`);
-    }
-    return parts.join(" · ");
+  // El balance se compara como los ingresos: subir es bueno. Debajo, qué parte de lo ingresado queda.
+  const balanceDelta = (): DeltaText => {
+    if (!data.hasPrevious || data.balanceChange === null) return { rest: "Sin registros para comparar", tone: "none" };
+    const c = data.balanceChange;
+    if (c === 0) return { rest: `Igual que en ${prevName}`, tone: "flat" };
+    return { strong: `${arrow(c)} ${formatEuros(Math.abs(c))}`, rest: ` frente a ${prevName}`, tone: toneFor("income", c) };
+  };
+
+  const retainedLine = () => {
+    const r = data.retainedPct;
+    if (r === null) return "Sin ingresos registrados";
+    return r >= 0 ? `Conservas el ${formatPct(r, false)} de lo ingresado` : `${formatPct(-r, false)} más gasto que ingreso`;
   };
 
   const header = (key: SortKey, label: string) => {
@@ -112,7 +116,8 @@ export default function SummaryView({ data, kind, sort, onKind, onSort, onOpenCa
         <div className="kpi">
           <h2 className="kpi__label">Balance del periodo</h2>
           <p className="kpi__value tabular">{formatBalance(data.balance)}</p>
-          <p className="kpi__delta">{balanceLine()}</p>
+          <Delta d={balanceDelta()} />
+          <p className="kpi__delta">{retainedLine()}</p>
         </div>
       </section>
       {data.futureExcluded > 0 && (
@@ -147,7 +152,8 @@ export default function SummaryView({ data, kind, sort, onKind, onSort, onOpenCa
               </thead>
               <tbody>
                 {rows.map((r) => {
-                  const tone = toneFor(kind, r.change);
+                  // Un cambio desde cero no es una señal: se escribe en gris (la columna % ya dice «Sin … previo»).
+                  const tone = r.previous === 0 ? "none" : toneFor(kind, r.change);
                   return (
                     // La fila entera abre el detalle con el ratón; el botón (Tab + Intro) es el control real
                     // y su clic llega a la fila por propagación.
@@ -169,7 +175,7 @@ export default function SummaryView({ data, kind, sort, onKind, onSort, onOpenCa
                       </td>
                       <td className={`num tabular tone tone--${tone}`}>
                         {r.changePct !== null ? (
-                          formatPct(r.changePct)
+                          formatChangePct(r.changePct)
                         ) : r.previous === 0 && r.change !== null ? (
                           <span className="muted-cell">Sin {kind === "expense" ? "gasto" : "ingreso"} previo</span>
                         ) : (

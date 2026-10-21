@@ -1,5 +1,5 @@
 import type { CategoryDetail, Insight, Kind, Metric, PeriodInfo } from "./api";
-import { formatEuros, formatEurosShort, formatPct, formatRange, monthName } from "./format";
+import { formatChangePct, formatEuros, formatEurosShort, formatPct, formatRange, monthName } from "./format";
 
 export type Tone = "good" | "bad" | "flat" | "none";
 
@@ -37,12 +37,12 @@ export function metricDelta(m: Metric, kind: Kind, p: PeriodInfo): DeltaText {
   if (m.previous === 0) return { rest: `Sin ${noun(kind)} previo registrado`, tone: "none" };
   const change = m.change ?? 0;
   if (change === 0) return { rest: `Sin cambio frente a ${versus(p)}`, tone: "flat" };
-  const pct = m.changePct !== null ? ` · ${formatPct(m.changePct)}` : "";
+  const pct = m.changePct !== null ? ` · ${formatChangePct(m.changePct)}` : "";
   return { strong: `${arrow(change)} ${formatEuros(Math.abs(change))}${pct}`, rest: ` frente a ${versus(p)}`, tone: toneFor(kind, change) };
 }
 
 export function subtitle(p: PeriodInfo): string {
-  const current = formatRange(p.range.start, p.range.end);
+  const current = `${p.isCurrentMonth ? "Mes en curso · " : ""}${formatRange(p.range.start, p.range.end)}`;
   if (!p.hasPrevious) return `${current} · Sin registros para comparar`;
   if (p.cutDay) {
     return `${current} · Comparación ${formatRange(p.compareRange.start, p.compareRange.end, false)} frente a ${formatRange(p.previousRange.start, p.previousRange.end)}`;

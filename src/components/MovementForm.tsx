@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
 import { Check, Plus } from "lucide-react";
 import { api, toAppError, type AppError, type Category, type Kind, type Movement, type MovementInput } from "../lib/api";
-import { centsToInput, newId, todayISO } from "../lib/format";
+import { centsToInput, newId, todayISO, yesterdayISO } from "../lib/format";
 import { CategoryIcon } from "../lib/icons";
 import Segmented from "./Segmented";
 
@@ -26,7 +26,11 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
   const [amount, setAmount] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [date, setDate] = useState(todayISO);
+  // Fecha «de hoy» sin tocar: sigue siendo hoy aunque la app pase la medianoche abierta.
+  const [dateIsToday, setDateIsToday] = useState(true);
   const [note, setNote] = useState("");
+  // Tipo y categoría del registro nuevo, guardados al entrar a editar para recuperarlos al salir.
+  const draft = useRef<{ kind: Kind; categoryId: string | null } | null>(null);
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -39,19 +43,40 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
     setErrors({});
     setFormError(null);
     if (editing) {
+      if (!draft.current) draft.current = { kind, categoryId };
       setKind(editing.kind);
       setAmount(centsToInput(editing.amountCents));
       setCategoryId(editing.categoryId);
       setDate(editing.date);
+      setDateIsToday(false);
       setNote(editing.note ?? "");
     } else {
+      if (draft.current) {
+        setKind(draft.current.kind);
+        setCategoryId(draft.current.categoryId);
+        draft.current = null;
+      }
       setAmount("");
       setNote("");
       setDate(todayISO());
+      setDateIsToday(true);
     }
     amountRef.current?.focus();
     if (editing) amountRef.current?.select();
   }, [editing]);
+
+  useEffect(() => {
+    if (!dateIsToday) return;
+    const refresh = () => setDate(todayISO());
+    window.addEventListener("focus", refresh);
+    return () => window.removeEventListener("focus", refresh);
+  }, [dateIsToday]);
+
+  const pickDate = (value: string) => {
+    setDate(value);
+    setDateIsToday(value === todayISO());
+    clearError("date");
+  };
 
   const visible = useMemo(
     () => categories.filter((c) => c.kind === kind && (!c.archived || (editing && c.id === editing.categoryId))),
@@ -89,7 +114,8 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
       return;
     }
 
-    const input: MovementInput = { kind, amount, categoryId: categoryId!, date, note: note.trim() || null };
+    const day = dateIsToday ? todayISO() : date;
+    const input: MovementInput = { kind, amount, categoryId: categoryId!, date: day, note: note.trim() || null };
     savingRef.current = true;
     setSaving(true);
     setFormError(null);
@@ -101,6 +127,7 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
       setErrors({});
       setAmount("");
       setNote("");
+      if (dateIsToday) setDate(day);
       onSaved(saved, editing);
       amountRef.current?.focus();
     } catch (err) {
@@ -194,7 +221,11 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
 
       <div className="fields">
         <label className="field">
-          <span className="label">Concepto · opcional</span>
+          <span className="field__head">
+            <span className="label">
+              Concepto <span className="label__opt">· opcional</span>
+            </span>
+          </span>
           <input
             className={`input${errors.note ? " is-invalid" : ""}`}
             maxLength={NOTE_MAX}
@@ -208,9 +239,30 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
           />
           <FieldError message={errors.note} />
         </label>
-        <label className="field">
-          <span className="label">Fecha</span>
+        <div className="field">
+          <div className="field__head">
+            <label className="label" htmlFor={`${uid}-fecha`}>
+              Fecha
+            </label>
+            <div className="quick-dates" role="group" aria-label="Fecha rápida">
+              {[
+                { label: "Hoy", value: todayISO() },
+                { label: "Ayer", value: yesterdayISO() },
+              ].map((q) => (
+                <button
+                  key={q.label}
+                  type="button"
+                  className="quick-date"
+                  aria-pressed={date === q.value}
+                  onClick={() => pickDate(q.value)}
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <input
+            id={`${uid}-fecha`}
             className={`input${errors.date ? " is-invalid" : ""}`}
             type="date"
             required
@@ -218,13 +270,10 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
             max="2200-12-31"
             value={date}
             aria-invalid={!!errors.date}
-            onChange={(e) => {
-              setDate(e.target.value);
-              clearError("date");
-            }}
+            onChange={(e) => pickDate(e.target.value)}
           />
           <FieldError message={errors.date} />
-        </label>
+        </div>
       </div>
 
       <div className="actions">

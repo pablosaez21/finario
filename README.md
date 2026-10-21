@@ -36,7 +36,26 @@ Para instalar la versión compilada en tu usuario: `ditto src-tauri/target/relea
 
 Tipografías de Google Fonts, empaquetadas localmente con Fontsource: **Fraunces** en la portada y el logotipo, e **Instrument Sans** en el registro.
 
-`pnpm dev` levanta solo el frontend en http://localhost:1420. Fuera de Tauri no hay base de datos, así que la interfaz no puede cargar ni guardar datos: úsalo solo para trabajar en estilos.
+`pnpm dev` levanta solo el frontend en http://localhost:1420. Fuera de Tauri no hay base de datos, así que la interfaz no puede cargar ni guardar datos.
+
+### Trabajar sobre una copia de los datos
+
+`pnpm app:dev` usa por defecto la base de datos real. En desarrollo, `FINARIO_DATA_DIR` la sustituye por otra carpeta (la app compilada con `pnpm app:build` ignora la variable):
+
+```sh
+mkdir -p /tmp/finario-copia
+sqlite3 ~/Library/Application\ Support/es.finario.escritorio/finario.sqlite3 ".backup /tmp/finario-copia/finario.sqlite3"
+FINARIO_DATA_DIR=/tmp/finario-copia pnpm app:dev
+```
+
+Para revisar la interfaz en un navegador (capturas, inspectores), hay un puente HTTP de desarrollo que expone los comandos Rust reales sobre esa copia en http://127.0.0.1:1430. Se niega a abrir la carpeta real:
+
+```sh
+FINARIO_DATA_DIR=/tmp/finario-copia pnpm bridge   # terminal 1
+pnpm dev:browser                                  # terminal 2 → http://localhost:1420
+```
+
+En `pnpm dev:browser`, `http://localhost:1420/#apuntar` y `#analisis` abren directamente esa pestaña.
 
 ### Aviso sobre Command Line Tools
 

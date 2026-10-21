@@ -47,13 +47,25 @@ export function formatLongDate(iso: string): string {
   return `${d} de ${MONTHS_LONG[m - 1]} de ${y}`;
 }
 
-export function relativeDay(iso: string): string | null {
-  const today = todayISO();
-  if (iso === today) return "Hoy";
+export function yesterdayISO(): string {
   const y = new Date();
   y.setDate(y.getDate() - 1);
-  const yesterday = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, "0")}-${String(y.getDate()).padStart(2, "0")}`;
-  return iso === yesterday ? "Ayer" : null;
+  return `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, "0")}-${String(y.getDate()).padStart(2, "0")}`;
+}
+
+export function relativeDay(iso: string): string | null {
+  if (iso === todayISO()) return "Hoy";
+  return iso === yesterdayISO() ? "Ayer" : null;
+}
+
+const WEEKDAYS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+/** Encabezado de un día en la lista: "Hoy", "Ayer" o "Domingo, 19 oct". */
+export function formatDayHeading(iso: string): string {
+  const relative = relativeDay(iso);
+  if (relative) return relative;
+  const { y, m, d } = parts(iso);
+  return `${WEEKDAYS[new Date(y, m - 1, d).getDay()]}, ${formatShortDate(iso)}`;
 }
 
 /** "2026-09-26T10:15:00" (hora local) → "26 sep 2026, 10:15". */
@@ -82,6 +94,15 @@ export function formatChange(cents: number): string {
 export function formatPct(value: number, signed = true): string {
   const sign = signed && value > 0 ? "+" : value < 0 ? "−" : "";
   return `${sign}${Math.abs(value).toFixed(1).replace(".", ",")}\u00a0%`;
+}
+
+/**
+ * Cambio porcentual legible. Desde una base muy pequeña (+3.608 %) el porcentaje no se lee:
+ * a partir de +1.000 % se expresa como múltiplo ("×37,1").
+ */
+export function formatChangePct(value: number): string {
+  if (value >= 1000) return `×${(1 + value / 100).toFixed(1).replace(".", ",")}`;
+  return formatPct(value);
 }
 
 export function formatBalance(cents: number): string {

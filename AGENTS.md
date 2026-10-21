@@ -37,6 +37,8 @@ Lee README.md, DESIGN.md, docs/ARCHITECTURE.md y docs/IMPLEMENTATION.md. Abre vi
 
 ## Verificación (comandos comprobados)
 
+- No probar contra los datos reales del usuario: `FINARIO_DATA_DIR=<copia> pnpm app:dev`, o `pnpm bridge` + `pnpm dev:browser` para revisar la interfaz en un navegador (ver README). El puente se niega a abrir la carpeta real.
+- Lenguaje visual del interior revisado el 21 oct 2026: ver «Lenguaje visual del interior» en DESIGN.md (cromo sin color, cobalto solo en el dato principal, sin sombras en reposo).
 - `pnpm typecheck`, `pnpm build`, `pnpm test:rust` (incluye un test IPC con el runtime simulado de Tauri que fija el contrato con `src/lib/api.ts`, y `analytics_tests.rs`, que reproduce el ejemplo verificado de docs/ANALYTICS.md), `pnpm app:build`.
 - En este Mac, las Command Line Tools traen un SDK 27.0 más nuevo que su `ld`: anteponer `SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk` a los comandos que compilan Rust.
 - Las crates de Tauri están fijadas en `src-tauri/Cargo.lock` (tauri 2.11.6 con runtime 2.11.x). `tauri-runtime 2.12.0` rompe tauri 2.11; no ejecutar `cargo update` sin revisar.

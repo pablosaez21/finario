@@ -110,11 +110,16 @@ Interacciones:
 
 ## Lenguaje visual del interior
 
-El color cobalto no es el requisito central del usuario. Puede mantenerse un acento coherente con la portada, sin teñir toda la superficie ni forzar una cabecera azul grande. Priorizar el lenguaje limpio de la maqueta ya aceptada.
+**Revisión del 21 oct 2026** (estilo «libro de cuentas», aplicado con la Taste Skill v2 en modo app): el cromo no lleva color. El cobalto del cielo de la portada se reserva para el dato principal (la cifra que se está apuntando, la curva y las barras del periodo actual) y para el foco; la comparación va en gris. Verde con «+» para ingresos, gastos en tinta con «−», rojo solo para errores, acciones destructivas y cambios a peor. Un cambio desde cero no se colorea.
 
-Base propuesta: blanco cálido para trabajar, tinta oscura para lectura, gris cálido para separadores y un acento contenido. Naranja cálido para la acción de entrada en portada. Rojo reservado para errores y acciones destructivas.
+- Suelo piedra (`--paper` #f4f3f1), paneles blancos con borde de 1 px y radio 8, sin sombras en reposo; solo flotan diálogos, avisos y tooltips.
+- Una barra superior de 52 px sobre el suelo: logotipo en Fraunces, pestañas Apuntar/Análisis, buscador, Categorías, Copias e Inicio (con un recorte del paisaje). Barra, contenido y pie comparten una columna centrada de 1208 px.
+- Acción principal casi negra; secundarias con borde. Sin degradados, sin desenfoques, sin etiquetas en mayúsculas espaciadas, sin iconos dentro de cajas.
+- Instrument Sans para todo el interior; títulos de pantalla a 24 px, cifras clave a 30 px, nada por debajo de 11 px. Cifras tabulares siempre.
+- Apuntar: el mes en curso (gastos, ingresos, balance) encabeza la lista; los movimientos se agrupan por día, con el total gastado cuando el día tiene dos gastos o más. Atajos «Hoy» y «Ayer» junto a la fecha. En la ventana mínima (900 × 620) el botón Guardar queda a la vista.
+- Análisis: el título es el mes, con flechas para cambiar de periodo. Los cambios porcentuales desde una base minúscula (≥ +1.000 %) se expresan como múltiplo («×37,1»).
 
-Tipografía: sans serif de sistema para controles y datos; serif contenida para identidad y algún título. Cifras tabulares para columnas de dinero. Iconos outline consistentes con etiqueta visible en acciones importantes. Controles con radio moderado, sin sombras grandes ni texturas detrás de datos.
+Base anterior (sigue vigente): tinta oscura para lectura, gris cálido para separadores, naranja cálido solo para la acción de entrada en portada. Iconos outline consistentes con etiqueta visible en acciones importantes.
 
 La aplicación debe conservar controles accesibles mediante teclado, foco visible, contraste legible y movimiento reducido cuando el sistema lo solicite. No añadir animación ambiental permanente al paisaje. Una transición breve y discreta al entrar es suficiente.
 

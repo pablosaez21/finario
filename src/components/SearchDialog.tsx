@@ -67,9 +67,13 @@ export default function SearchDialog({ defaultScope, period, onClose, onNavigate
   }, []);
 
   const trimmed = query.trim();
+  const queryKey = `${scope}|${trimmed}`;
+  // Consulta a la que corresponden los resultados en pantalla, e Intro pendiente de que lleguen.
+  const [resultsKey, setResultsKey] = useState("");
+  const pendingEnter = useRef(false);
 
   const run = useCallback(
-    async (opts: { append?: boolean; categoryLimit?: number } = {}) => {
+    async (opts: { append?: boolean; categoryLimit?: number; movementLimit?: number } = {}) => {
       if (!trimmed) {
         seq.current++;
         setResults(null);
@@ -85,15 +89,16 @@ export default function SearchDialog({ defaultScope, period, onClose, onNavigate
           start: scope === "period" ? period.start : null,
           end: scope === "period" ? period.end : null,
           categoryLimit: opts.categoryLimit ?? categoryLimit,
-          movementLimit: MOVEMENT_PAGE,
+          movementLimit: opts.movementLimit ?? MOVEMENT_PAGE,
           movementOffset: opts.append ? (results?.movements.length ?? 0) : 0,
         });
         if (id !== seq.current) return;
         setResults((prev) =>
           opts.append && prev ? { ...res, movements: [...prev.movements, ...res.movements] } : res,
         );
+        setResultsKey(`${scope}|${trimmed}`);
         setError(null);
-        if (!opts.append) setActive(0);
+        if (!opts.append && !opts.movementLimit) setActive(0);
       } catch (err) {
         if (id !== seq.current) return;
         setError(toAppError(err).message);
@@ -142,7 +147,8 @@ export default function SearchDialog({ defaultScope, period, onClose, onNavigate
     if (o.type === "more-categories") {
       const next = categoryLimit + 20;
       setCategoryLimit(next);
-      return void run({ categoryLimit: next });
+      // Conserva los movimientos ya cargados con «Cargar más» y la selección actual.
+      return void run({ categoryLimit: next, movementLimit: Math.max(MOVEMENT_PAGE, results?.movements.length ?? 0) });
     }
     navigated.current = true;
     if (o.type === "nav") onNavigate(o.tab);
@@ -158,9 +164,23 @@ export default function SearchDialog({ defaultScope, period, onClose, onNavigate
       setActive((i) => (i + delta + options.length) % options.length);
     } else if (e.key === "Enter") {
       e.preventDefault();
+      // Con la búsqueda aún en espera, Intro abriría un resultado de la consulta anterior:
+      // se busca ya y se abre el primero en cuanto llegue.
+      if (trimmed && (loading || resultsKey !== queryKey)) {
+        pendingEnter.current = true;
+        if (!loading) run({ categoryLimit: CATEGORY_PAGE });
+        return;
+      }
       choose(options[active]);
     }
   };
+
+  useEffect(() => {
+    if (pendingEnter.current && !loading && resultsKey === queryKey) {
+      pendingEnter.current = false;
+      choose(options[0]);
+    }
+  }); // tras cada render: se comprueba cuando los resultados ya corresponden a la consulta.
 
   const optionId = (i: number) => `${baseId}-opt-${i}`;
   const hasQueryResults = !!results && results.categories.length + results.movements.length > 0;

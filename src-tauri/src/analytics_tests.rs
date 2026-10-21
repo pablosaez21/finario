@@ -24,6 +24,7 @@ fn add(store: &mut Store, kind: Kind, cents: i64, category: &str, date: &str, no
             category_id: category.into(),
             date: date.into(),
             note: note.map(Into::into),
+            revert: false,
         })
         .unwrap()
         .id
@@ -269,6 +270,7 @@ fn edits_deletes_and_archived_categories_recalculate() {
         category_id: "transporte".into(),
         date: "2026-09-02".into(),
         note: None,
+        revert: false,
     };
     store.update_movement(&id, &edit).unwrap();
     assert_eq!(store.analytics_summary("2026-09", d("2026-09-27")).unwrap().expense.total, 5500);

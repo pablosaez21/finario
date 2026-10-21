@@ -5,7 +5,8 @@
  */
 const SELECTOR = "button:not([tabindex]), summary:not([tabindex]), a[href]:not([tabindex])";
 
-const FOCUSABLE = 'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, a[href], [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE =
+  'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, a[href], [tabindex]:not([tabindex="-1"]):not(:disabled)';
 
 /** Mantiene Tab / Mayús+Tab dentro de un diálogo modal (WebKit puede salir al documento). */
 export function trapTab(e: { key: string; shiftKey: boolean; preventDefault: () => void }, container: HTMLElement | null): void {

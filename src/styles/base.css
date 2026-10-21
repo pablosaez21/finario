@@ -1,29 +1,35 @@
 :root {
-  --paper: #faf9f5;
-  --panel: #f0efe8;
-  --ink: #232b2a;
-  --muted: #626862;
-  --line: #dcded4;
-  --line-strong: #c4c7ba;
-  --blue: #1649d8;
-  --blue-deep: #123fc6;
-  --blue-soft: #e9effe;
+  /* Interior: «libro de cuentas» sin color en el cromo. El cobalto del cielo de la portada se
+     reserva para el dato principal (el periodo actual, la cifra que se está apuntando) y el foco. */
+  --paper: #f4f3f1; /* suelo: piedra, apenas cálido */
+  --surface: #ffffff; /* paneles y diálogos */
+  --raised: #f6f6f4; /* pozos dentro de un panel */
+  --panel: #f6f6f4;
+  --active: #ebeae6; /* selección neutra (fila, opción, pastilla) */
+  --ink: #171817;
+  --muted: #5c5f5b;
+  --line: #e4e3df; /* bordes de panel */
+  --rule: #eeede9; /* filas */
+  --line-strong: #cdccc6; /* bordes de control */
+  --primary: #1b1c1b; /* acción principal, casi negra */
+  --blue: #1d4fc4;
+  --blue-deep: #163f9e;
+  --blue-soft: #eef2fb;
   --orange: #ea5834;
-  --income: #2d6a3e;
-  --danger: #ae2e22;
-  --danger-soft: #fbecea;
+  --income: #247b50;
+  --danger: #b3261e;
+  --danger-soft: #fdeeec;
 
   /* Portada: Fraunces, serif «old style» inspirada en la publicidad impresa de principios del s. XX. */
   --font-portada: "Fraunces Variable", Georgia, "Times New Roman", serif;
   /* Registro: Instrument Sans, grotesca editorial con cifras tabulares. */
   --font-app: "Instrument Sans Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 
-  --radius: 5px;
+  --radius: 6px;
+  --radius-card: 8px;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --shadow-xs: 0 1px 2px rgb(35 43 42 / 0.06);
-  --shadow-sm: 0 1px 2px rgb(35 43 42 / 0.06), 0 2px 6px -2px rgb(35 43 42 / 0.1);
-  --shadow-md: 0 2px 4px rgb(35 43 42 / 0.05), 0 8px 20px -6px rgb(35 43 42 / 0.16);
-  --shadow-lg: 0 12px 40px -8px rgb(20 26 25 / 0.28), 0 2px 6px rgb(20 26 25 / 0.08);
+  /* Sin sombras en reposo: solo flota lo que flota (diálogos, avisos, menús). */
+  --shadow-float: 0 12px 32px -8px rgb(20 22 20 / 0.22), 0 2px 6px rgb(20 22 20 / 0.06);
 
   color-scheme: light;
   font-synthesis: none;

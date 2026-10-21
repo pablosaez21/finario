@@ -18,6 +18,7 @@ fn input(kind: Kind, amount: &str, category: &str) -> MovementInput {
         category_id: category.into(),
         date: "2026-09-26".into(),
         note: None,
+        revert: false,
     }
 }
 
@@ -188,6 +189,25 @@ fn restore_rejects_invalid_files_and_keeps_data() {
         assert_eq!(err.code, "invalid_backup", "{bad:?}");
     }
     assert_eq!(store.list_movements(50, 0).unwrap().total, 1);
+}
+
+#[test]
+fn undoing_an_edit_restores_an_archived_category() {
+    let dir = TempDir::new().unwrap();
+    let mut store = open(dir.path());
+    let m = store.create_movement(&input(Kind::Expense, "12", "ocio")).unwrap();
+    store.set_category_archived("ocio", true).unwrap();
+    store.update_movement(&m.id, &input(Kind::Expense, "12", "salud")).unwrap();
+
+    // Una edición normal no puede volver a una categoría archivada…
+    let err = store.update_movement(&m.id, &input(Kind::Expense, "12", "ocio")).unwrap_err();
+    assert_eq!(err.code, "category_archived");
+    // …pero Deshacer sí devuelve el movimiento a donde estaba.
+    let mut undo = input(Kind::Expense, "12", "ocio");
+    undo.revert = true;
+    assert_eq!(store.update_movement(&m.id, &undo).unwrap().category_id, "ocio");
+    // Y el indicador no sirve para crear movimientos nuevos en categorías archivadas.
+    assert_eq!(store.create_movement(&undo).unwrap_err().code, "category_archived");
 }
 
 /// Llama a los comandos por IPC con los mismos nombres y argumentos que usa src/lib/api.ts.

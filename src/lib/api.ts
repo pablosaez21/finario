@@ -33,6 +33,8 @@ export interface MovementInput {
   categoryId: string;
   date: string;
   note?: string | null;
+  /** Solo para Deshacer: permite volver a una categoría archivada después. */
+  revert?: boolean;
 }
 
 export interface MovementPage {
@@ -188,7 +190,7 @@ export interface AppError {
   field?: "amount" | "category" | "date" | "note" | "name" | "icon";
 }
 
-/** Datos editables de un movimiento guardado (para deshacer ediciones). */
+/** Datos editables de un movimiento guardado, para deshacer ediciones. */
 export function movementToInput(m: Movement): MovementInput {
   const cents = m.amountCents;
   return {
@@ -197,6 +199,7 @@ export function movementToInput(m: Movement): MovementInput {
     categoryId: m.categoryId,
     date: m.date,
     note: m.note,
+    revert: true,
   };
 }
 
@@ -208,9 +211,19 @@ export function toAppError(err: unknown): AppError {
   return { code: "unknown", message: typeof err === "string" ? err : "Ha ocurrido un error inesperado." };
 }
 
+/** Solo en `pnpm dev:browser`: los comandos van al puente HTTP de src-tauri/src/dev_bridge.rs. */
+const BRIDGE = import.meta.env.DEV ? (import.meta.env.VITE_BRIDGE as string | undefined) : undefined;
+
+async function viaBridge<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
+  const res = await fetch(`${BRIDGE}/${cmd}`, { method: "POST", body: JSON.stringify(args ?? {}) });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw data;
+  return data as T;
+}
+
 const call = async <T>(cmd: string, args?: Record<string, unknown>): Promise<T> => {
   try {
-    return await invoke<T>(cmd, args);
+    return BRIDGE ? await viaBridge<T>(cmd, args) : await invoke<T>(cmd, args);
   } catch (err) {
     throw toAppError(err);
   }

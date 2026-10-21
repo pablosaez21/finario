@@ -58,6 +58,7 @@ export default function BackupsDialog({ onClose, onRestored, onBackupCreated }: 
           : "Copias locales de tus datos."
       }
       onClose={onClose}
+      closable={!busy}
       wide
     >
       {pending ? (

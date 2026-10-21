@@ -8,10 +8,12 @@ interface Props {
   onClose: () => void;
   children: ReactNode;
   wide?: boolean;
+  /** false mientras una operación no debe interrumpirse (p. ej. restaurar una copia). */
+  closable?: boolean;
 }
 
 /** Diálogo modal nativo: atrapa el foco, se cierra con Esc y devuelve el foco al cerrar. */
-export default function Dialog({ title, description, onClose, children, wide }: Props) {
+export default function Dialog({ title, description, onClose, children, wide, closable = true }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -34,10 +36,10 @@ export default function Dialog({ title, description, onClose, children, wide }: 
       aria-labelledby={titleId}
       onCancel={(e) => {
         e.preventDefault();
-        onClose();
+        if (closable) onClose();
       }}
       onMouseDown={(e) => {
-        if (e.target === ref.current) onClose();
+        if (closable && e.target === ref.current) onClose();
       }}
       onKeyDown={(e) => trapTab(e, ref.current)}
     >
@@ -49,7 +51,7 @@ export default function Dialog({ title, description, onClose, children, wide }: 
             </h2>
             {description && <p className="dialog__desc">{description}</p>}
           </div>
-          <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar">
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar" disabled={!closable}>
             <X size={18} strokeWidth={1.8} aria-hidden="true" />
           </button>
         </header>

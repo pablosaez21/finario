@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight, Pencil } from "lucide-react";
 import type { CategoryDetail, Movement } from "../../lib/api";
-import { formatEuros, formatEurosShort, formatPct, formatRange, formatShortDate, formatSigned, monthShort } from "../../lib/format";
+import { formatChangePct, formatEuros, formatEurosShort, formatPct, formatRange, formatShortDate, formatSigned, monthShort } from "../../lib/format";
 import { arrow, detailBody, detailHeadline, previousName, subtitle, toneFor, versus } from "../../lib/analytics";
 import { CategoryIcon } from "../../lib/icons";
 import { Delta } from "./SummaryView";
@@ -29,7 +29,7 @@ export default function DetailView({ data, showAll, onBack, onToggleAll, onEdit 
     if (prev.total === 0) return { rest: `Sin ${noun} previo registrado`, tone: "none" as const };
     const ch = data.totalChange ?? 0;
     if (ch === 0) return { rest: `Sin cambio frente a ${versus(data)}`, tone: "flat" as const };
-    const pct = data.totalChangePct !== null ? ` · ${formatPct(data.totalChangePct)}` : "";
+    const pct = data.totalChangePct !== null ? ` · ${formatChangePct(data.totalChangePct)}` : "";
     return { strong: `${arrow(ch)} ${formatEuros(Math.abs(ch))}${pct}`, rest: ` frente a ${versus(data)}`, tone: toneFor(kind, ch) };
   };
 
@@ -68,16 +68,14 @@ export default function DetailView({ data, showAll, onBack, onToggleAll, onEdit 
       <header className="analysis__head">
         <div>
           <h1 className="analysis__title detail__title" tabIndex={-1} id="detail-title">
-            <span className="detail__icon" aria-hidden="true">
-              <CategoryIcon name={c.icon} size={20} />
-            </span>
+            <CategoryIcon className="detail__icon" name={c.icon} size={22} />
             {c.name}
             {c.archived && <span className="tag">archivada</span>}
           </h1>
           <p className="analysis__subtitle">{subtitle(data)}</p>
         </div>
         {data.sharePct !== null && (
-          <span className="chip">
+          <span className="detail__share tabular">
             {formatPct(data.sharePct, false)} de tus {kind === "expense" ? "gastos" : "ingresos"}
           </span>
         )}
@@ -106,9 +104,9 @@ export default function DetailView({ data, showAll, onBack, onToggleAll, onEdit 
       <div className="analysis__grid">
         <div className="detail__left">
           <section className="insight" aria-labelledby="changed-title">
-            <p className="insight__eyebrow" id="changed-title">
+            <h2 className="section-title insight__heading" id="changed-title">
               Qué ha cambiado
-            </p>
+            </h2>
             {!data.hasPrevious ? (
               <>
                 <h3 className="insight__title">Sin registros para comparar</h3>
@@ -136,11 +134,11 @@ export default function DetailView({ data, showAll, onBack, onToggleAll, onEdit 
                 <p className="insight__line">{detailBody(data)}</p>
                 <div className="insight__stats">
                   <p>
-                    <strong className="tabular">{data.countChangePct !== null ? formatPct(data.countChangePct) : "—"}</strong>
+                    <strong className="tabular">{data.countChangePct !== null ? formatChangePct(data.countChangePct) : "—"}</strong>
                     <span>en número de movimientos</span>
                   </p>
                   <p>
-                    <strong className="tabular">{data.averageChangePct !== null ? formatPct(data.averageChangePct) : "—"}</strong>
+                    <strong className="tabular">{data.averageChangePct !== null ? formatChangePct(data.averageChangePct) : "—"}</strong>
                     <span>en importe medio</span>
                   </p>
                 </div>
@@ -158,9 +156,10 @@ export default function DetailView({ data, showAll, onBack, onToggleAll, onEdit 
                 const current = i === data.evolution.length - 1;
                 return (
                   <li key={e.month} className={`bars__item${current ? " is-current" : ""}`}>
-                    <span className="bars__value tabular">{formatEurosShort(Math.round(e.total / 100) * 100)}</span>
+                    {/* La cifra va justo encima de su barra; un cero no dibuja barra. */}
                     <span className="bars__track" aria-hidden="true">
-                      <span className="bars__fill" style={{ height: `${(e.total / maxEvolution) * 100}%` }} />
+                      <span className="bars__value tabular">{formatEurosShort(Math.round(e.total / 100) * 100)}</span>
+                      {e.total > 0 && <span className="bars__fill" style={{ height: `${(e.total / maxEvolution) * 80}px` }} />}
                     </span>
                     <span className="bars__month">
                       {monthShort(e.month)}
@@ -226,7 +225,7 @@ export default function DetailView({ data, showAll, onBack, onToggleAll, onEdit 
               {!showAll && <ArrowRight size={14} strokeWidth={1.9} aria-hidden="true" />}
             </button>
           )}
-          <p className="note">Si un movimiento está mal categorizado, edítalo aquí: las cifras se recalculan al guardar.</p>
+          <p className="analysis__hint">Pulsa un movimiento para corregirlo; las cifras se recalculan al guardar.</p>
         </section>
       </div>
     </div>

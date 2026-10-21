@@ -23,14 +23,17 @@ export default function CategoriesDialog({ categories, onChanged, onClose }: Pro
   const active = ofKind.filter((c) => !c.archived);
   const archived = ofKind.filter((c) => c.archived);
 
-  const run = async (fn: () => Promise<void>) => {
-    if (busy) return;
+  /** Devuelve si la operación terminó bien (el editor solo se vacía entonces). */
+  const run = async (fn: () => Promise<void>): Promise<boolean> => {
+    if (busy) return false;
     setBusy(true);
     setError(null);
     try {
       await fn();
+      return true;
     } catch (err) {
       setError(toAppError(err).message);
+      return false;
     } finally {
       setBusy(false);
     }
@@ -193,7 +196,7 @@ interface EditorProps {
   submitLabel: string;
   busy: boolean;
   resetOnSubmit?: boolean;
-  onSubmit: (name: string, icon: string) => Promise<void> | void;
+  onSubmit: (name: string, icon: string) => Promise<boolean | void> | void;
   onCancel?: () => void;
 }
 
@@ -205,8 +208,8 @@ function CategoryEditor({ initialName, initialIcon, submitLabel, busy, resetOnSu
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    await onSubmit(name, icon);
-    if (resetOnSubmit) {
+    const ok = await onSubmit(name, icon);
+    if (resetOnSubmit && ok !== false) {
       setName("");
       setIcon(initialIcon);
       setPickerOpen(false);

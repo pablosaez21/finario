@@ -8,6 +8,8 @@ mod store;
 #[cfg(test)]
 mod analytics_tests;
 #[cfg(test)]
+mod dev_bridge;
+#[cfg(test)]
 mod tests;
 
 use std::path::PathBuf;
@@ -144,13 +146,27 @@ pub fn run() {
     with_commands(tauri::Builder::default())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
-            let data_dir = app.path().app_data_dir()?;
+            // En desarrollo, FINARIO_DATA_DIR permite trabajar sobre una copia de los datos. La app
+            // compilada para uso real ignora la variable y usa siempre su carpeta.
+            let data_dir = match std::env::var_os("FINARIO_DATA_DIR") {
+                Some(dir) if cfg!(debug_assertions) => PathBuf::from(dir),
+                _ => app.path().app_data_dir()?,
+            };
             let (db_path, backups_dir) = backup::default_paths(&data_dir);
             let store = Store::open(&db_path, &backups_dir).map_err(|e| e.message)?;
             if let Err(e) = store.auto_backup_if_due() {
                 eprintln!("Finario: no se pudo crear la copia automática: {e}");
             }
             app.manage(AppState(Mutex::new(store)));
+
+            // La copia diaria también se hace si la app sigue abierta al cambiar de día.
+            let handle = app.handle().clone();
+            std::thread::spawn(move || loop {
+                std::thread::sleep(std::time::Duration::from_secs(30 * 60));
+                if let Err(e) = handle.state::<AppState>().with(|s| s.auto_backup_if_due()) {
+                    eprintln!("Finario: no se pudo crear la copia automática: {e}");
+                }
+            });
             Ok(())
         })
         .run(tauri::generate_context!())

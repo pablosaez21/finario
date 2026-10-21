@@ -131,26 +131,14 @@ export default function Analisis({ active, version, nav, setNav, onEditMovement,
   const canNext = nav.month < thisMonth;
   const noData = summary.loaded?.data.firstMonth === null && summary.loaded.data.month === nav.month;
 
-  const monthPicker = (
-    <div className="period">
-      {nav.month === thisMonth ? (
-        <span className="chip">Mes en curso</span>
-      ) : (
-        <button type="button" className="chip chip--button" onClick={() => setMonth(thisMonth)}>
-          Ir al mes en curso
-        </button>
-      )}
-      <div className="stepper" role="group" aria-label="Periodo">
-        <button type="button" className="stepper__btn" onClick={() => setMonth(addMonths(nav.month, -1))} disabled={!canPrev} aria-label="Mes anterior">
-          <ChevronLeft size={16} strokeWidth={1.9} aria-hidden="true" />
-        </button>
-        <span className="stepper__label" aria-live="polite">
-          {monthLabel(nav.month)}
-        </span>
-        <button type="button" className="stepper__btn" onClick={() => setMonth(addMonths(nav.month, 1))} disabled={!canNext} aria-label="Mes siguiente">
-          <ChevronRight size={16} strokeWidth={1.9} aria-hidden="true" />
-        </button>
-      </div>
+  const monthNav = (
+    <div className="period" role="group" aria-label="Cambiar de mes">
+      <button type="button" className="icon-btn period__btn" onClick={() => setMonth(addMonths(nav.month, -1))} disabled={!canPrev} aria-label="Mes anterior" title="Mes anterior">
+        <ChevronLeft size={18} strokeWidth={1.9} aria-hidden="true" />
+      </button>
+      <button type="button" className="icon-btn period__btn" onClick={() => setMonth(addMonths(nav.month, 1))} disabled={!canNext} aria-label="Mes siguiente" title="Mes siguiente">
+        <ChevronRight size={18} strokeWidth={1.9} aria-hidden="true" />
+      </button>
     </div>
   );
 
@@ -203,12 +191,19 @@ export default function Analisis({ active, version, nav, setNav, onEditMovement,
       <>
         <header className="analysis__head">
           <div>
-            <h1 className="analysis__title" id="analysis-title" tabIndex={-1}>
-              Tu mes, con perspectiva.
-            </h1>
+            <div className="analysis__titlerow">
+              <h1 className="analysis__title" id="analysis-title" tabIndex={-1} aria-live="polite">
+                {monthLabel(nav.month)}
+              </h1>
+              {monthNav}
+            </div>
             <p className="analysis__subtitle">{summaryData ? subtitle(summaryData) : "Calculando…"}</p>
           </div>
-          {monthPicker}
+          {nav.month !== thisMonth && (
+            <button type="button" className="btn-secondary" onClick={() => setMonth(thisMonth)}>
+              Ir al mes en curso
+            </button>
+          )}
         </header>
         {summaryData ? (
           <div key={summaryData.month} className="fade-in">

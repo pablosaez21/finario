@@ -83,6 +83,10 @@ pub struct MovementInput {
     pub date: String,
     #[serde(default)]
     pub note: Option<String>,
+    /// Deshacer una edición: devuelve el movimiento a sus valores anteriores aunque su categoría
+    /// se haya archivado entretanto.
+    #[serde(default)]
+    pub revert: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -308,7 +312,7 @@ impl Store {
         if kind != input.kind.as_str() {
             return Err(AppError::field("category", "category_kind_mismatch", "La categoría no corresponde al tipo de movimiento."));
         }
-        if archived && previous_category != Some(input.category_id.as_str()) {
+        if archived && !(input.revert && previous_category.is_some()) && previous_category != Some(input.category_id.as_str()) {
             return Err(AppError::field("category", "category_archived", "Esa categoría está archivada. Elige otra."));
         }
         Ok(Validated {

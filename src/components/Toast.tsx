@@ -21,8 +21,11 @@ export default function Toast({ toast, onClose }: Props) {
   const [undoing, setUndoing] = useState(false);
   const timer = useRef<number | undefined>(undefined);
 
+  // Cada aviso empieza sin pausa: si el anterior se cerró con el ratón encima, `mouseleave`
+  // nunca llegó y el siguiente se quedaría fijo.
   useEffect(() => {
     setUndoing(false);
+    setPaused(false);
   }, [toast?.id]);
 
   useEffect(() => {

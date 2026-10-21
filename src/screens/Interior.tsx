@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { DatabaseBackup, House, Search, Tags } from "lucide-react";
+import { DatabaseBackup, Search, Tags } from "lucide-react";
+import paisaje from "../assets/portada-madrid.jpg";
 import Toast, { type ToastData } from "../components/Toast";
 import CategoriesDialog from "../components/CategoriesDialog";
 import BackupsDialog from "../components/BackupsDialog";
@@ -124,58 +125,70 @@ export default function Interior({ initialTab, onHome }: Props) {
 
   return (
     <div className="registro">
-      <header className="head">
-        <p className="head__brand">Finario</p>
-        <div className="head__actions">
-          <button type="button" className="head__search" onClick={() => setSearchOpen(true)} aria-keyshortcuts={isMac() ? "Meta+K" : "Control+K"}>
-            <Search size={15} strokeWidth={1.8} aria-hidden="true" />
-            <span>Buscar…</span>
-            <kbd aria-hidden="true">{isMac() ? "⌘K" : "Ctrl K"}</kbd>
-          </button>
-          <button type="button" className="head__home" onClick={onHome}>
-            <House size={16} strokeWidth={1.7} aria-hidden="true" />
-            Inicio
-          </button>
+      <header className="bar">
+        <div className="bar__inner">
+          <p className="bar__brand">Finario</p>
+
+          <nav className="tabs" aria-label="Secciones">
+            <div ref={tabsRef} className={`tabs__list${indicatorReady ? " is-ready" : ""}`} role="tablist" aria-label="Secciones" onKeyDown={onTabKey}>
+              {TABS.map((t) => (
+                <button
+                  key={t.key}
+                  id={`tab-${t.key}`}
+                  data-key={t.key}
+                  type="button"
+                  role="tab"
+                  className="tabs__item"
+                  aria-selected={tab === t.key}
+                  aria-controls={`panel-${t.key}`}
+                  tabIndex={tab === t.key ? 0 : -1}
+                  onClick={() => selectTab(t.key)}
+                >
+                  {t.label}
+                </button>
+              ))}
+              <span className="tabs__indicator" style={indicatorStyle} aria-hidden="true" />
+            </div>
+          </nav>
+
+          <div className="bar__tools">
+            <button type="button" className="bar__search" onClick={() => setSearchOpen(true)} aria-keyshortcuts={isMac() ? "Meta+K" : "Control+K"}>
+              <Search size={15} strokeWidth={1.8} aria-hidden="true" />
+              <span>Buscar…</span>
+              <kbd aria-hidden="true">{isMac() ? "⌘K" : "Ctrl K"}</kbd>
+            </button>
+            <button type="button" className="tool" onClick={() => setDialog("categorias")} title="Categorías">
+              <Tags size={16} strokeWidth={1.6} aria-hidden="true" />
+              <span className="tool__label">Categorías</span>
+            </button>
+            <button type="button" className="tool" onClick={() => setDialog("copias")} title="Copias de seguridad">
+              <DatabaseBackup size={16} strokeWidth={1.6} aria-hidden="true" />
+              <span className="tool__label">Copias</span>
+            </button>
+            <button type="button" className="bar__home" onClick={onHome}>
+              <img className="bar__home-thumb" src={paisaje} alt="" draggable={false} />
+              Inicio
+            </button>
+          </div>
         </div>
       </header>
-
-      <nav className="tabs" aria-label="Secciones">
-        <div ref={tabsRef} className={`tabs__list${indicatorReady ? " is-ready" : ""}`} role="tablist" aria-label="Secciones" onKeyDown={onTabKey}>
-          {TABS.map((t) => (
-            <button
-              key={t.key}
-              id={`tab-${t.key}`}
-              data-key={t.key}
-              type="button"
-              role="tab"
-              className="tabs__item"
-              aria-selected={tab === t.key}
-              aria-controls={`panel-${t.key}`}
-              tabIndex={tab === t.key ? 0 : -1}
-              onClick={() => selectTab(t.key)}
-            >
-              {t.label}
-            </button>
-          ))}
-          <span className="tabs__indicator" style={indicatorStyle} aria-hidden="true" />
-        </div>
-        <div className="tabs__tools">
-          <button type="button" className="tool" onClick={() => setDialog("categorias")}>
-            <Tags size={16} strokeWidth={1.6} aria-hidden="true" />
-            Categorías
-          </button>
-          <button type="button" className="tool" onClick={() => setDialog("copias")}>
-            <DatabaseBackup size={16} strokeWidth={1.6} aria-hidden="true" />
-            Copias de seguridad
-          </button>
-        </div>
-      </nav>
 
       <div className="panels">
         {/* Ambas vistas permanecen montadas: cambiar de pestaña no pierde un formulario a medias
             ni el periodo, orden o scroll del análisis. */}
         <section id="panel-apuntar" role="tabpanel" aria-labelledby="tab-apuntar" className="panel" hidden={tab !== "apuntar"}>
-          <Apuntar key={restoreKey} categories={categories} version={version} onChanged={bump} notify={notify} undoable={undoable} />
+          <Apuntar
+            key={restoreKey}
+            categories={categories}
+            version={version}
+            onChanged={bump}
+            notify={notify}
+            undoable={undoable}
+            onOpenAnalysis={() => {
+              setNav((n) => ({ ...n, month: currentMonth(), detailId: null }));
+              selectTab("analisis");
+            }}
+          />
         </section>
         <section id="panel-analisis" role="tabpanel" aria-labelledby="tab-analisis" className="panel" hidden={tab !== "analisis"}>
           <Analisis

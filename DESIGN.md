@@ -131,10 +131,11 @@ Por decisión del usuario, el paisaje cambia con la hora real en Madrid (altura 
 - Farola: apagada de día; al anochecer se enciende con un par de parpadeos, titila y proyecta un cono de luz.
 - Cartel de Mahou: las letras se iluminan (más de noche) y fallan de vez en cuando, como un rótulo viejo.
 - Ventanas: se encienden al anochecer y de madrugada quedan una de cada cinco.
+- Nubes: cinco cúmulos pintados en código (bordes de pincel y grano de lienzo) cruzan despacio de izquierda a derecha, por debajo del lema y por detrás de torres y edificios. Blancas de día, melocotón con el sol bajo, rosas al atardecer; de noche desaparecen.
 - Cuatro Torres: un reflejo de sol cruza los cristales de día; de noche, plantas encendidas.
 - Grano de película en movimiento sobre todo el cuadro.
 
-Pocas cosas a la vez, lentas, y nada alrededor del título y los botones. Los cambios de luz tardan 50 s; con movimiento reducido se mantiene la luz de la hora y se quitan parpadeos, destellos y grano. Las capas se generan con `scripts/prepare-portada-capas.py` sin modificar el paisaje.
+Pocas cosas a la vez, lentas, y nada alrededor del título y los botones. Los cambios de luz tardan 50 s; con movimiento reducido se mantiene la luz de la hora y se quitan parpadeos, destellos y grano, y las nubes quedan quietas. Las capas se generan con `scripts/prepare-portada-capas.py` sin modificar el paisaje.
 
 ## Fase futura: Análisis / Mi mes
 

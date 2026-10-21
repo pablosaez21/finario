@@ -38,7 +38,7 @@
 }
 
 /* Tras el primer fotograma, la luz cambia despacio: un minuto real por paso. */
-.escena.is-ready :is(.escena__calido, .escena__noche, .cielo, .estrellas, .torres__destello, .torres__plantas, .ventanas, .mahou) {
+.escena.is-ready :is(.escena__calido, .escena__noche, .cielo, .nubes, .estrellas, .torres__destello, .torres__plantas, .ventanas, .mahou) {
   transition: opacity 50s linear;
 }
 
@@ -107,9 +107,40 @@
   background: linear-gradient(180deg, #050a22 0%, #0b1438 45%, #18245a 66%, #2b3768 80%); /* taste-skill-ignore */
 }
 
+/* ---------- Nubes ---------- */
+
+.nubes,
 .estrellas {
   position: absolute;
   inset: 0;
+}
+
+.nubes__defs {
+  position: absolute;
+}
+
+.nube {
+  position: absolute;
+  left: 0;
+  aspect-ratio: 300 / 120;
+  will-change: transform;
+  animation: nube-cruza linear infinite;
+}
+
+.nube svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes nube-cruza {
+  from {
+    transform: translateX(-35vw);
+  }
+  to {
+    transform: translateX(105vw);
+  }
 }
 
 .estrella {
@@ -503,6 +534,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .nube {
+    animation: none;
+    transform: translateX(var(--x0));
+  }
+
   .estrella--titila,
   .torres__destello span,
   .mahou__letras,

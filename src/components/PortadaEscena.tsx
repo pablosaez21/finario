@@ -35,6 +35,46 @@ const STARS = Array.from({ length: 140 }, (_, i) => ({
   .filter((s) => !(s.left > 28 && s.left < 72 && s.top < 46))
   .slice(0, 80);
 
+// Nubes: cúmulos de cuatro a seis lomas sobre una base plana, en la franja entre el lema y el
+// horizonte. Cruzan de izquierda a derecha; las cercanas (grandes) van más deprisa.
+const CLOUDS = [
+  { top: 21, width: 25, duration: 210, offset: 0.08, bumps: 5, seed: 11 },
+  { top: 33, width: 17, duration: 260, offset: 0.42, bumps: 4, seed: 23 },
+  { top: 26, width: 31, duration: 180, offset: 0.67, bumps: 6, seed: 37 },
+  { top: 40, width: 13, duration: 300, offset: 0.25, bumps: 4, seed: 41 },
+  { top: 37, width: 21, duration: 240, offset: 0.88, bumps: 5, seed: 53 },
+];
+
+/** Un cúmulo en una caja de 300 × 120: un racimo de manchas, más alto en el centro, base plana. */
+function cloudBlobs(bumps: number, seed: number) {
+  const n = bumps * 3;
+  return Array.from({ length: n }, (_, k) => {
+    const t = k / (n - 1);
+    const centre = 1 - Math.abs(t - 0.5) * 1.7;
+    const r = 14 + centre * 30 + seeded(seed + k) * 14;
+    return {
+      cx: 34 + t * 232 + (seeded(seed + k + 40) - 0.5) * 18,
+      cy: 100 - r * 0.62 - centre * seeded(seed + k + 80) * 22,
+      r,
+    };
+  });
+}
+
+type Rgb = [number, number, number];
+const mix = (a: Rgb, b: Rgb, t: number): Rgb => a.map((v, i) => v + (b[i] - v) * t) as Rgb;
+const rgb = ([r, g, b]: Rgb) => `rgb(${r.toFixed(0)} ${g.toFixed(0)} ${b.toFixed(0)})`;
+
+/** Color de las nubes según la luz: blancas de día, melocotón con el sol bajo, rosa al atardecer. */
+function cloudColors(l: Light) {
+  let light: Rgb = [255, 250, 240];
+  let shade: Rgb = [150, 168, 204];
+  light = mix(light, [255, 214, 170], l.golden);
+  shade = mix(shade, [204, 150, 140], l.golden);
+  light = mix(light, [246, 172, 178], l.dusk);
+  shade = mix(shade, [104, 86, 140], l.dusk);
+  return { light: rgb(light), shade: rgb(shade) };
+}
+
 /** Hora forzada solo en desarrollo: `?hora=21:30` en el navegador o `VITE_HORA=21:30 pnpm app:dev`. */
 function forcedDate(): Date | null {
   if (!import.meta.env.DEV) return null;
@@ -94,6 +134,7 @@ export default function PortadaEscena() {
   }, []);
 
   const darkness = Math.min(0.78, l.night * 0.78 + l.dusk * 0.42);
+  const clouds = cloudColors(l);
   const lampOn = l.lights > 0.35;
 
   return (
@@ -106,6 +147,59 @@ export default function PortadaEscena() {
         <div className="cielo cielo--dorado" style={{ opacity: l.golden * 0.85 }} />
         <div className="cielo cielo--crepusculo" style={{ opacity: l.dusk * 0.9 }} />
         <div className="cielo cielo--noche" style={{ opacity: l.night }} />
+        <div className="nubes" style={{ opacity: (1 - l.night) * 0.82, "--nube-luz": clouds.light, "--nube-sombra": clouds.shade } as CSSProperties}>
+          <svg className="nubes__defs" width="0" height="0" aria-hidden="true">
+            <defs>
+              <linearGradient id="nube-color" gradientUnits="userSpaceOnUse" x1="0" y1="18" x2="0" y2="104">
+                <stop offset="0.3" style={{ stopColor: "var(--nube-luz)" }} />
+                <stop offset="1" style={{ stopColor: "var(--nube-sombra)" }} />
+              </linearGradient>
+              {/* Pincel: el contorno se deforma con ruido, se suaviza y se grana como el lienzo. */}
+              <filter id="nube-pincel" x="-15%" y="-30%" width="130%" height="160%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="3" seed="7" result="warp" />
+                <feDisplacementMap in="SourceGraphic" in2="warp" scale="26" xChannelSelector="R" yChannelSelector="G" result="shape" />
+                <feGaussianBlur in="shape" stdDeviation="2.4" result="soft" />
+                <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="2" seed="3" result="grain" />
+                <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.55 0 0 0 0.66" result="grainAlpha" />
+                <feComposite in="soft" in2="grainAlpha" operator="in" />
+              </filter>
+            </defs>
+          </svg>
+          {CLOUDS.map((c, i) => (
+            <div
+              key={i}
+              className="nube"
+              style={
+                {
+                  top: `${c.top}%`,
+                  width: `${c.width}vw`,
+                  animationDuration: `${c.duration}s`,
+                  animationDelay: `${-c.offset * c.duration}s`,
+                  "--x0": `${c.offset * 130 - 30}vw`,
+                } as CSSProperties
+              }
+            >
+              <svg viewBox="0 0 300 120" preserveAspectRatio="xMidYMid meet">
+                <g filter="url(#nube-pincel)">
+                  <g fill="url(#nube-color)">
+                    <ellipse cx="150" cy="96" rx="128" ry="11" />
+                    {cloudBlobs(c.bumps, c.seed).map((b, k) => (
+                      <circle key={k} cx={b.cx} cy={b.cy} r={b.r} />
+                    ))}
+                  </g>
+                  {/* Luz del sol en las lomas altas, desde arriba a la izquierda. */}
+                  <g style={{ fill: "var(--nube-luz)" }} opacity="0.85">
+                    {cloudBlobs(c.bumps, c.seed)
+                      .filter((_, k) => k % 2 === 0)
+                      .map((b, k) => (
+                        <circle key={k} cx={b.cx - b.r * 0.22} cy={b.cy - b.r * 0.28} r={b.r * 0.62} />
+                      ))}
+                  </g>
+                </g>
+              </svg>
+            </div>
+          ))}
+        </div>
         <div className="estrellas" style={{ opacity: l.night }}>
           {STARS.map((s, i) => (
             <span

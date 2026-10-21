@@ -121,7 +121,20 @@ Interacciones:
 
 Base anterior (sigue vigente): tinta oscura para lectura, gris cálido para separadores, naranja cálido solo para la acción de entrada en portada. Iconos outline consistentes con etiqueta visible en acciones importantes.
 
-La aplicación debe conservar controles accesibles mediante teclado, foco visible, contraste legible y movimiento reducido cuando el sistema lo solicite. No añadir animación ambiental permanente al paisaje. Una transición breve y discreta al entrar es suficiente.
+La aplicación debe conservar controles accesibles mediante teclado, foco visible, contraste legible y movimiento reducido cuando el sistema lo solicite.
+
+## Portada viva (21 oct 2026)
+
+Por decisión del usuario, el paisaje cambia con la hora real en Madrid (altura del sol calculada en `src/lib/sol.ts`); sustituye a la regla anterior de «sin animación ambiental»:
+
+- Cielo: azul de día, hora dorada, crepúsculo rosa y violeta, noche con estrellas. Solo se tiñe el cielo (máscara `portada-cielo.png`); la ciudad se oscurece aparte.
+- Farola: apagada de día; al anochecer se enciende con un par de parpadeos, titila y proyecta un cono de luz.
+- Cartel de Mahou: las letras se iluminan (más de noche) y fallan de vez en cuando, como un rótulo viejo.
+- Ventanas: se encienden al anochecer y de madrugada quedan una de cada cinco.
+- Cuatro Torres: un reflejo de sol cruza los cristales de día; de noche, plantas encendidas.
+- Grano de película en movimiento sobre todo el cuadro.
+
+Pocas cosas a la vez, lentas, y nada alrededor del título y los botones. Los cambios de luz tardan 50 s; con movimiento reducido se mantiene la luz de la hora y se quitan parpadeos, destellos y grano. Las capas se generan con `scripts/prepare-portada-capas.py` sin modificar el paisaje.
 
 ## Fase futura: Análisis / Mi mes
 

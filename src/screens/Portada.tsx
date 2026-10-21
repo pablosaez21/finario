@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ArrowRight, ChartNoAxesColumn, Wallet } from "lucide-react";
-import paisaje from "../assets/portada-madrid.jpg";
+import PortadaEscena from "../components/PortadaEscena";
 import type { Tab } from "./Interior";
 import "../styles/portada.css";
 
@@ -21,8 +21,7 @@ export default function Portada({ onOpen, focusTab = null }: Props) {
 
   return (
     <main className="portada">
-      <img className="portada__paisaje" src={paisaje} alt="" draggable={false} />
-      <div className="portada__grano" aria-hidden="true" />
+      <PortadaEscena />
 
       <div className="portada__contenido">
         <h1 className="portada__titulo">Finario</h1>

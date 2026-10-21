@@ -78,7 +78,7 @@ SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk pnpm app:dev
 src/                    React + TypeScript
   screens/              Portada, Interior (pestañas), Apuntar y Análisis
   components/           Formulario, lista, avisos, diálogos, buscador y analytics/
-  lib/                  API de comandos Tauri, formato, iconos
+  lib/                  API de comandos Tauri, formato, iconos, luz según la hora (sol.ts)
   assets/               Paisaje de portada sin interfaz incrustada
 src-tauri/src/          Rust
   db.rs                 Conexión, PRAGMAs y migraciones
@@ -93,6 +93,8 @@ scripts/prepare-portada.py   Genera src/assets/portada-madrid.jpg desde la refer
 ```
 
 `scripts/prepare-portada.py` requiere `opencv-python-headless` y `numpy`. No modifica la referencia original.
+
+`scripts/prepare-portada-capas.py` (mismos requisitos) genera las capas de la portada viva: máscaras del cielo, las torres, la farola y las letras de Mahou, y las ventanas que se encienden. Para ver la portada a otra hora en desarrollo: `http://localhost:1420/?hora=21:30` con `pnpm dev`, o `VITE_HORA=21:30 pnpm app:dev`.
 
 ## Documentación de diseño
 

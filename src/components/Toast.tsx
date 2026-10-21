@@ -19,6 +19,8 @@ const DURATION = 7000;
 export default function Toast({ toast, onClose }: Props) {
   const [paused, setPaused] = useState(false);
   const [undoing, setUndoing] = useState(false);
+  // Al cerrarse, el aviso sale animado y solo después se desmonta.
+  const [leaving, setLeaving] = useState(false);
   const timer = useRef<number | undefined>(undefined);
 
   // Cada aviso empieza sin pausa: si el anterior se cerró con el ratón encima, `mouseleave`
@@ -26,11 +28,12 @@ export default function Toast({ toast, onClose }: Props) {
   useEffect(() => {
     setUndoing(false);
     setPaused(false);
+    setLeaving(false);
   }, [toast?.id]);
 
   useEffect(() => {
     if (!toast || paused) return;
-    timer.current = window.setTimeout(onClose, toast.tone === "error" ? DURATION * 1.5 : DURATION);
+    timer.current = window.setTimeout(() => setLeaving(true), toast.tone === "error" ? DURATION * 1.5 : DURATION);
     return () => window.clearTimeout(timer.current);
   }, [toast, paused, onClose]);
 
@@ -42,7 +45,10 @@ export default function Toast({ toast, onClose }: Props) {
     <div className="toast-region" role={toast.tone === "error" ? "alert" : "status"} aria-live="polite">
       <div
         key={toast.id}
-        className={`toast toast--${toast.tone ?? "success"}`}
+        className={`toast toast--${toast.tone ?? "success"}${leaving ? " is-leaving" : ""}`}
+        onAnimationEnd={(e) => {
+          if (leaving && e.target === e.currentTarget) onClose();
+        }}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         onFocus={() => setPaused(true)}
@@ -71,7 +77,7 @@ export default function Toast({ toast, onClose }: Props) {
             {undoing ? "Deshaciendo…" : "Deshacer"}
           </button>
         )}
-        <button type="button" className="toast__close" onClick={onClose} aria-label="Cerrar aviso">
+        <button type="button" className="toast__close" onClick={() => setLeaving(true)} aria-label="Cerrar aviso">
           <X size={15} strokeWidth={2} aria-hidden="true" />
         </button>
       </div>

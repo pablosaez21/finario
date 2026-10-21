@@ -123,6 +123,23 @@ Base anterior (sigue vigente): tinta oscura para lectura, gris cálido para sepa
 
 La aplicación debe conservar controles accesibles mediante teclado, foco visible, contraste legible y movimiento reducido cuando el sistema lo solicite.
 
+## Movimiento (21 oct 2026, auditoría con las skills de Emil Kowalski)
+
+- Curvas compartidas en `base.css`: `--ease-out` (0.23, 1, 0.32, 1) para entradas, respuestas y hovers; `--ease-in-out` (0.77, 0, 0.175, 1) para lo que se desplaza (indicadores de pestaña, 200 ms). Nunca `ease-in`. Interfaz por debajo de 300 ms.
+- Lo que se abre con teclado decenas de veces al día no se anima: el buscador ⌘K aparece ya abierto.
+- Los controles que más se pulsan se hunden a `scale: 0.97` en 160 ms (botones, categorías, Hoy/Ayer, herramientas).
+- Los avisos entran desde abajo en 220 ms y salen hacia abajo en 160 ms antes de desmontarse.
+- Movimiento reducido: menos, no cero. Las entradas quedan en fundido, nada se desplaza ni se hunde, los indicadores saltan.
+
+## Casos extremos (break-ui)
+
+Probado con una base de casos extremos (importes de 0,01 € a 1.000 M€, conceptos de 120 caracteres, URL sin espacios, emoji, nombres de categoría de 40 caracteres, 15 categorías, movimientos de 1999 y del año siguiente, base vacía):
+- Las cifras del mes en Apuntar pasan de columnas a filas cuando alguna supera «−99.999,99 €».
+- En la tabla de categorías el nombre se parte en varias líneas; las cifras nunca se truncan.
+- Ejes y extremos de la gráfica abrevian desde 10.000 € («12 mil €», «1,2 M€»).
+- Porcentajes y múltiplos con separador de miles; desde +1.000 % se escriben como «×N».
+- Todo texto truncado lleva `title` con el valor completo.
+
 ## Portada viva (21 oct 2026)
 
 Por decisión del usuario, el paisaje cambia con la hora real en Madrid (altura del sol calculada en `src/lib/sol.ts`); sustituye a la regla anterior de «sin animación ambiental»:

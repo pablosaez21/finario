@@ -27,7 +27,11 @@
 
   --radius: 6px;
   --radius-card: 8px;
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  /* Curvas: ease-out fuerte para entradas, respuestas y hovers; ease-in-out para lo que se
+     desplaza por la pantalla (indicadores de pestaña). Nunca ease-in en la interfaz. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease: var(--ease-out);
   /* Sin sombras en reposo: solo flota lo que flota (diálogos, avisos, menús). */
   --shadow-float: 0 12px 32px -8px rgb(20 22 20 / 0.22), 0 2px 6px rgb(20 22 20 / 0.06);
 
@@ -133,12 +137,45 @@ p {
   font-variant-numeric: tabular-nums;
 }
 
+/* Respuesta al pulsar: los controles que más se usan se hunden un poco. `scale` (y no
+   `transform`) para no pisar otras transformaciones. `html` sube la especificidad por encima de
+   las transiciones propias de cada control, que se declaran después. */
+html :is(.btn-primary, .btn-secondary, .btn-ghost, .btn-danger, .category, .quick-date, .tool, .icon-btn,
+  .seg__option, .bar__home, .bar__search, .more, .toast__undo, .link-btn, .crumbs__back) {
+  transition-property: background-color, border-color, color, box-shadow, opacity, scale;
+  transition-duration: 120ms, 120ms, 120ms, 120ms, 120ms, 160ms;
+  transition-timing-function: var(--ease-out);
+}
+
+:is(.btn-primary, .btn-secondary, .btn-ghost, .btn-danger, .category, .quick-date, .tool, .icon-btn,
+  .seg__option, .bar__home, .bar__search, .more, .toast__undo, .link-btn, .crumbs__back):active:not(:disabled) {
+  scale: 0.97;
+}
+
+/* Movimiento reducido: menos y más suave, no cero. Las entradas se quedan en fundido, los
+   indicadores saltan sin deslizarse y nada se desplaza ni se hunde. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  html :is(.toast, .dialog, .view-enter, .portada__contenido) {
+    animation-name: aparece;
+  }
+
+  html .toast.is-leaving {
+    animation-name: desaparece;
+  }
+
+  .tabs__indicator,
+  .seg__indicator {
+    transition: none !important;
+  }
+
+  :active:not(:disabled) {
+    scale: none !important;
+  }
+
+  .link-btn:hover svg,
+  .crumbs__back:hover svg,
+  .ctable__row:hover .ctable__go,
+  .portada__boton:hover .portada__flecha {
+    transform: none !important;
   }
 }

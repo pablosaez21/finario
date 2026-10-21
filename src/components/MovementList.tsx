@@ -49,6 +49,13 @@ export default function MovementList({
 }: Props) {
   const days = byDay(movements);
   const partial = movements.length < total;
+  const figures = month && {
+    spent: formatEuros(month.expense.total),
+    earned: formatEuros(month.income.total),
+    balance: formatBalance(month.balance),
+  };
+  // Tres columnas caben hasta «−99.999,99 €»; con cifras más largas pasan a filas para no pisarse.
+  const longFigures = !!figures && Object.values(figures).some((f) => f.length > 12);
 
   return (
     <section className="recents" aria-labelledby="recientes-titulo">
@@ -61,18 +68,18 @@ export default function MovementList({
               <ArrowRight size={14} strokeWidth={1.9} aria-hidden="true" />
             </button>
           </div>
-          <dl className="month__figures">
+          <dl className={`month__figures${longFigures ? " is-long" : ""}`}>
             <div>
               <dt>Gastos</dt>
-              <dd className="tabular month__spent">{formatEuros(month.expense.total)}</dd>
+              <dd className="tabular month__spent">{figures!.spent}</dd>
             </div>
             <div>
               <dt>Ingresos</dt>
-              <dd className="tabular">{formatEuros(month.income.total)}</dd>
+              <dd className="tabular">{figures!.earned}</dd>
             </div>
             <div>
               <dt>Balance</dt>
-              <dd className={`tabular${month.balance === 0 ? " is-zero" : ""}`}>{formatBalance(month.balance)}</dd>
+              <dd className="tabular">{figures!.balance}</dd>
             </div>
           </dl>
         </div>
@@ -129,8 +136,14 @@ export default function MovementList({
                       >
                         <CategoryIcon className="row__icon" name={m.categoryIcon} size={16} />
                         <div className="row__text">
-                          <p className="row__title">{title}</p>
-                          {m.note && <small className="row__meta">{m.categoryName}</small>}
+                          <p className="row__title" title={title}>
+                            {title}
+                          </p>
+                          {m.note && (
+                            <small className="row__meta" title={m.categoryName}>
+                              {m.categoryName}
+                            </small>
+                          )}
                         </div>
                         <div className="row__actions">
                           <button type="button" className="icon-btn icon-btn--small" onClick={() => onEdit(m)} aria-label={`Editar ${title}`} title="Editar">

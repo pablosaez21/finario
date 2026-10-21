@@ -3,7 +3,7 @@ import { ArrowDown, ArrowRight, ArrowUp, ArrowUpRight } from "lucide-react";
 import Segmented from "../Segmented";
 import CumulativeChart from "./CumulativeChart";
 import type { CategoryRow, Kind, Summary } from "../../lib/api";
-import { formatBalance, formatChange, formatChangePct, formatEuros, formatPct, monthName } from "../../lib/format";
+import { formatBalance, formatChange, formatChangePct, formatEuros, formatMultiple, formatPct, monthName } from "../../lib/format";
 import { arrow, insightText, metricDelta, previousName, toneFor, type DeltaText } from "../../lib/analytics";
 
 export type SortKey = "total" | "change" | "pct";
@@ -72,7 +72,9 @@ export default function SummaryView({ data, kind, sort, onKind, onSort, onOpenCa
   const retainedLine = () => {
     const r = data.retainedPct;
     if (r === null) return "Sin ingresos registrados";
-    return r >= 0 ? `Conservas el ${formatPct(r, false)} de lo ingresado` : `${formatPct(-r, false)} más gasto que ingreso`;
+    if (r >= 0) return `Conservas el ${formatPct(r, false)} de lo ingresado`;
+    // Con gastos de más del doble de lo ingresado, «veces» se lee mejor que «350.867 % más».
+    return r >= -100 ? `${formatPct(-r, false)} más gasto que ingreso` : `Gastos ${formatMultiple(1 - r / 100).slice(1)} veces los ingresos`;
   };
 
   const header = (key: SortKey, label: string) => {

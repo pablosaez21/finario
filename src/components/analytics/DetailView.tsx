@@ -84,7 +84,7 @@ export default function DetailView({ data, showAll, onBack, onToggleAll, onEdit 
       <section className="kpis" aria-label={`Resumen de ${c.name}`}>
         <div className="kpi">
           <h2 className="kpi__label">
-            {kind === "expense" ? "Gasto" : "Ingreso"} en {c.name.toLowerCase()}
+            {kind === "expense" ? "Gasto" : "Ingreso"} del periodo
           </h2>
           <p className="kpi__value tabular">{formatEuros(data.current.total)}</p>
           <Delta d={totalDelta()} />

@@ -162,7 +162,7 @@
 }
 
 .tabs__list.is-ready .tabs__indicator {
-  transition: transform 170ms var(--ease), width 170ms var(--ease);
+  transition: transform 200ms var(--ease-in-out), width 200ms var(--ease-in-out);
 }
 
 /* ---------- Paneles ---------- */
@@ -254,7 +254,7 @@
 }
 
 .seg.is-ready .seg__indicator {
-  transition: transform 150ms var(--ease), width 150ms var(--ease);
+  transition: transform 200ms var(--ease-in-out), width 200ms var(--ease-in-out);
 }
 
 .seg__option {
@@ -551,14 +551,6 @@ kbd {
   border-radius: var(--radius);
   font-weight: 500;
   white-space: nowrap;
-  transition: background-color 120ms var(--ease), border-color 120ms var(--ease), color 120ms var(--ease), transform 80ms var(--ease);
-}
-
-.btn-primary:active:not(:disabled),
-.btn-secondary:active:not(:disabled),
-.btn-ghost:active:not(:disabled),
-.btn-danger:active:not(:disabled) {
-  transform: scale(0.98);
 }
 
 .btn-primary {
@@ -725,8 +717,20 @@ kbd {
   white-space: nowrap;
 }
 
-.month__figures dd.is-zero {
-  color: var(--muted);
+.month__figures.is-long {
+  grid-template-columns: 1fr;
+  gap: 2px;
+}
+
+.month__figures.is-long > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.month__figures.is-long dd {
+  font-size: 15px;
 }
 
 /* ---------- Últimos movimientos ---------- */
@@ -942,6 +946,11 @@ kbd {
   font-size: 13px;
   box-shadow: var(--shadow-float);
   animation: toast-entra 220ms var(--ease) both;
+}
+
+/* Sale hacia donde entró, más deprisa de lo que entra. */
+.toast.is-leaving {
+  animation: toast-sale 160ms var(--ease-out) forwards;
 }
 
 .toast__icon {
@@ -1406,6 +1415,19 @@ kbd {
 
 @keyframes aparece {
   from {
+    opacity: 0;
+  }
+}
+
+@keyframes toast-sale {
+  to {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes desaparece {
+  to {
     opacity: 0;
   }
 }

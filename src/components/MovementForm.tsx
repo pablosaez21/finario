@@ -205,6 +205,7 @@ export default function MovementForm({ categories, editing, onSaved, onCancelEdi
             key={c.id}
             type="button"
             className="category"
+            title={c.name}
             aria-pressed={categoryId === c.id}
             onClick={() => {
               setCategoryId(c.id);

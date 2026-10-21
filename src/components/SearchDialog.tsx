@@ -237,8 +237,10 @@ export default function SearchDialog({ defaultScope, period, onClose, onNavigate
                 {o.category.archived && <span className="tag">archivada</span>}
               </span>
               <span className="sp-option__meta">
-                Categoría de {o.category.kind === "expense" ? "gasto" : "ingreso"} · {o.category.movementCount}{" "}
-                {o.category.movementCount === 1 ? "movimiento" : "movimientos"}
+                Categoría de {o.category.kind === "expense" ? "gasto" : "ingreso"} ·{" "}
+                {o.category.movementCount === 0
+                  ? "sin movimientos"
+                  : `${o.category.movementCount} ${o.category.movementCount === 1 ? "movimiento" : "movimientos"}`}
               </span>
             </span>
             <CornerDownLeft className="sp-option__enter" size={14} strokeWidth={1.8} aria-hidden="true" />
@@ -252,7 +254,9 @@ export default function SearchDialog({ defaultScope, period, onClose, onNavigate
               <CategoryIcon name={m.categoryIcon} size={17} />
             </span>
             <span className="sp-option__text">
-              <span className="sp-option__title">{m.note || m.categoryName}</span>
+              <span className="sp-option__title" title={m.note || m.categoryName}>
+                {m.note || m.categoryName}
+              </span>
               <span className="sp-option__meta">
                 {formatShortDate(m.date)} · {m.categoryName}
               </span>

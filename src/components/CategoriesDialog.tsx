@@ -99,7 +99,7 @@ export default function CategoriesDialog({ categories, onChanged, onClose }: Pro
               <span className="cat-item__icon">
                 <CategoryIcon name={c.icon} size={16} />
               </span>
-              <span className="cat-item__name">{c.name}</span>
+              <span className="cat-item__name" title={c.name}>{c.name}</span>
               <span className="cat-item__count tabular">
                 {c.movementCount > 0 ? `${c.movementCount} ${c.movementCount === 1 ? "movimiento" : "movimientos"}` : "Sin uso"}
               </span>
@@ -161,7 +161,7 @@ export default function CategoriesDialog({ categories, onChanged, onClose }: Pro
                 <span className="cat-item__icon">
                   <CategoryIcon name={c.icon} size={16} />
                 </span>
-                <span className="cat-item__name">{c.name}</span>
+                <span className="cat-item__name" title={c.name}>{c.name}</span>
                 <span className="cat-item__count tabular">
                   {c.movementCount} {c.movementCount === 1 ? "movimiento" : "movimientos"}
                 </span>

@@ -19,9 +19,10 @@ export function formatSigned(cents: number, kind: Kind): string {
   return `${kind === "expense" ? "−" : "+"}${formatEuros(cents)}`;
 }
 
-/** Céntimos a texto editable con coma decimal: 1250 → "12,50". */
+/** Céntimos a texto editable con coma decimal y miles con punto: 24999999 → "249.999,99". */
 export function centsToInput(cents: number): string {
-  return `${Math.floor(cents / 100)},${(cents % 100).toString().padStart(2, "0")}`;
+  const euros = Math.floor(cents / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${euros},${(cents % 100).toString().padStart(2, "0")}`;
 }
 
 /** Fecha local de hoy como YYYY-MM-DD (sin convertir a UTC). */
@@ -91,9 +92,21 @@ export function formatChange(cents: number): string {
   return cents > 0 ? `+${formatEuros(cents)}` : formatEuros(cents);
 }
 
+/** Número con separador de miles y coma decimal: 14552.04 → "14.552,0". */
+export function formatNumber(value: number, decimals: number): string {
+  const [int, dec] = Math.abs(value).toFixed(decimals).split(".");
+  const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return dec ? `${grouped},${dec}` : grouped;
+}
+
 export function formatPct(value: number, signed = true): string {
   const sign = signed && value > 0 ? "+" : value < 0 ? "−" : "";
-  return `${sign}${Math.abs(value).toFixed(1).replace(".", ",")}\u00a0%`;
+  return `${sign}${formatNumber(value, 1)}\u00a0%`;
+}
+
+/** Cuántas veces: "×3,5", "×37" o "×14.552" (sin decimales a partir de 100). */
+export function formatMultiple(times: number): string {
+  return `×${formatNumber(times, times < 100 ? 1 : 0)}`;
 }
 
 /**
@@ -101,7 +114,7 @@ export function formatPct(value: number, signed = true): string {
  * a partir de +1.000 % se expresa como múltiplo ("×37,1").
  */
 export function formatChangePct(value: number): string {
-  if (value >= 1000) return `×${(1 + value / 100).toFixed(1).replace(".", ",")}`;
+  if (value >= 1000) return formatMultiple(1 + value / 100);
   return formatPct(value);
 }
 

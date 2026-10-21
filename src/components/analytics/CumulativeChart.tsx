@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, type MouseEvent } from "react";
 import type { Series } from "../../lib/api";
-import { formatEuros, formatEurosShort } from "../../lib/format";
+import { formatEuros, formatEurosShort, formatNumber } from "../../lib/format";
 
 interface Props {
   series: Series;
@@ -10,7 +10,7 @@ interface Props {
 
 const W = 520;
 const H = 220;
-const PAD = { l: 50, r: 66, t: 14, b: 30 };
+const PAD = { l: 58, r: 66, t: 14, b: 30 };
 const STEPS = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
 
 /** Escala «redonda» con tres tramos: 1.664 € → 0, 600, 1.200, 1.800 €. */
@@ -22,8 +22,17 @@ function niceScale(maxCents: number): number[] {
   return [0, 1, 2, 3].map((i) => Math.round(i * step * 100));
 }
 
-/** Etiquetas del eje en euros enteros: 166440 → "1.664 €". */
-const euros = (cents: number) => formatEurosShort(Math.round(cents / 100) * 100);
+/**
+ * Etiquetas del eje y de los extremos: euros enteros hasta 9.999 € ("1.664 €") y abreviadas a
+ * partir de ahí para que quepan ("12 mil €", "1,2 M€", "1.000 M€").
+ */
+const euros = (cents: number) => {
+  const v = Math.round(cents / 100);
+  const short = (n: number) => formatNumber(n, Number.isInteger(n) || n >= 100 ? 0 : 1);
+  if (Math.abs(v) >= 1_000_000) return `${short(Math.round((v / 1_000_000) * 10) / 10)}\u00a0M€`;
+  if (Math.abs(v) >= 10_000) return `${short(Math.round(v / 1000))}\u00a0mil\u00a0€`;
+  return formatEurosShort(v * 100);
+};
 
 export default function CumulativeChart({ series, currentLabel, previousLabel }: Props) {
   const [hover, setHover] = useState<number | null>(null);

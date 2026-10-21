@@ -162,6 +162,11 @@
   align-items: start;
 }
 
+/* Red de seguridad: si aun así no cabe, la tabla se desplaza dentro de su panel. */
+.breakdown {
+  overflow-x: auto;
+}
+
 .breakdown,
 .trend,
 .movs,
@@ -289,8 +294,9 @@
   background: var(--raised);
 }
 
+/* El nombre se parte en dos líneas antes que empujar las cifras fuera del panel. */
 .ctable__name {
-  width: 42%;
+  min-width: 9em;
   padding-right: 10px !important;
 }
 
@@ -312,12 +318,13 @@
 }
 
 .ctable__label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: inline;
+  overflow-wrap: anywhere;
+}
+
+.ctable__go {
+  vertical-align: -2px;
+  margin-left: 4px;
 }
 
 .ctable__go {
@@ -794,12 +801,11 @@
   color: var(--ink);
   box-shadow: var(--shadow-float);
   overflow: hidden;
-  animation: spotlight-entra 160ms var(--ease) both;
+  /* Sin animación de apertura: ⌘K se usa decenas de veces al día y tiene que estar ya ahí. */
 }
 
 .spotlight::backdrop {
   background: rgb(20 22 20 / 0.3);
-  animation: aparece 160ms var(--ease) both;
 }
 
 .spotlight__panel {
@@ -973,13 +979,6 @@
 
 .spotlight__foot kbd {
   margin-right: 3px;
-}
-
-@keyframes spotlight-entra {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
 }
 
 @keyframes gira {

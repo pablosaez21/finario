@@ -379,7 +379,7 @@
 }
 
 .portada__boton--principal:active {
-  transform: scale(0.99);
+  transform: scale(0.98);
   background: #a8391a;
 }
 
@@ -408,7 +408,7 @@
 }
 
 .portada__boton--analisis:active {
-  transform: scale(0.99);
+  transform: scale(0.98);
 }
 
 @keyframes titila {

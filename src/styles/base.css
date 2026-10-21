@@ -96,6 +96,39 @@ p {
   border: 0;
 }
 
+/* Barras de desplazamiento finas: un trazo de 4 px sin carril que se oscurece al pasar por
+   encima. El borde transparente amplía la zona de agarre sin engordar el trazo. */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  min-height: 40px;
+  border: 4px solid transparent;
+  border-radius: 999px;
+  background: rgb(23 24 23 / 0.16) padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  border-width: 3px;
+  background-color: rgb(23 24 23 / 0.34);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: rgb(23 24 23 / 0.45);
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
 .tabular {
   font-variant-numeric: tabular-nums;
 }

@@ -211,7 +211,9 @@
   min-height: 0;
   overflow: auto;
   margin: 20px 0;
-  padding: 20px 20px 16px;
+  /* 8 px + 12 px de barra reservada = 20 px, igual que el margen izquierdo. */
+  padding: 20px 8px 16px 20px;
+  scrollbar-gutter: stable;
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
   background: var(--surface);
